@@ -1,0 +1,13 @@
+Package: iasva
+Title: Iteratively Adjusted Surrogate Variable Analysis
+Version: 1.0
+Date: 2017-01-16
+Author: Donghyung Lee <Donghyung.Lee@jax.org>,
+    Anthony Cheng <Anthony.Cheng@jax.org>, Duygu Ucar <Duygu.Ucar@jax.org>
+Maintainer: Donghyung Lee <Donghyung.Lee@jax.org>,
+    Anthony Cheng <Anthony.Cheng@jax.org>
+Description: IA-SVA can be used to uncover hidden heterogeneity in bulk and single cell transcriptomic data.
+License: GPL-2
+biocViews: Preprocessing, QualityControl, BatchEffect
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
