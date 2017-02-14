@@ -6,8 +6,10 @@ Iteratively Adjusted Surrogate Variable Analysis (IA-SVA) is a statistical frame
 
 To install this package, start R and enter the following commands:
 
-  install.packages("devtools")
-  library(devtools)
-  install_github("UcarLab/IA-SVA")
+      install.packages("devtools")
+  
+      library(devtools)
+  
+      install_github("UcarLab/IA-SVA")
 
 
