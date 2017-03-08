@@ -50,3 +50,4 @@ library(iasva)
 data(iasva_test)
 iasva(iasvaY, iasvaX)  
 }
+
