@@ -57,6 +57,9 @@ iasva <- function(Y, X, permute=TRUE, num.p=100, num.sv=NULL, sig.cutoff= 0.05, 
     isv <- isv+1
     cat(paste0("\nSV",isv, " Detected!"))
   }
+  colnames(sv) <- paste0("SV", 1:ncol(sv))
+  colnames(sv.resid) <- paste0("SV", 1:ncol(sv))
+  
   row.names(wgt) <- NULL
   cat(paste0("\n# of significant surrogate variables: ",length(pval)))
   return(list(sv=sv, sv.resid=sv.resid, pc.stat.obs=pc.stat.obs, pval=pval, wgt=wgt, rsq=rsq, n.sv=length(pval)))
