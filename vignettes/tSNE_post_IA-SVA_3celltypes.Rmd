@@ -1,0 +1,127 @@
+---
+title: "IA-SVA based feature selection improves the performance of clustering algorithms (e.g., tSNE)"
+author: "Donghyung Lee"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+The IA-SVA based feature selection can improve the performance of clustering algorithms (e.g., tSNE or hierarchical clustering). To illustrate how the IA-SVA method can be used to improve the performance of clustering algorithms, we use real-world single cell RNA sequencing (scRNA-Seq) data obtained from human pancreatic islet samples ([Lawlor et. al., 2016](http://genome.cshlp.org/content/early/2017/01/16/gr.212720.116)). This dataset is included in a R data package ("iasvaExamples") containing data examples for IA-SVA (https://github.com/dleelab/iasvaExamples). To install the 'iasvaExamples' package, follow the instruction provided in the GitHub page.
+
+## Load packages
+```{r load_packages, echo=TRUE}
+rm(list=ls())
+library(iasva)
+library(iasvaExamples)
+library(Rtsne)
+library(pheatmap)
+```
+
+## Load the islet single cell RNA-Seq data
+```{r load_data, echo=TRUE}
+data("Lawlor_Islet_scRNAseq_Read_Counts")
+data("Lawlor_Islet_scRNAseq_Annotations")
+ls()
+counts <- Lawlor_Islet_scRNAseq_Read_Counts
+anns <- Lawlor_Islet_scRNAseq_Annotations
+dim(anns)
+dim(counts)
+# set seed for the random number generator.
+set.seed(344532456)
+```
+The annotations describing the islet samples and experimental settings are stored in "anns" and the read counts information is stored in "counts". 
+
+## Extract three cell types (GCG, INS, KRT19 expressed cells) from non-diabetics and filter out low-expressed genes 
+```{r alpha_cells, echo=TRUE, results='asis'}
+counts <- counts[, (anns$Phenotype!="Non-Diabetic")&
+                    ((anns$Cell_Type=="GCG")|
+                      (anns$Cell_Type=="INS")|
+                        (anns$Cell_Type=="KRT19"))]
+anns <- subset(anns, (Phenotype!="Non-Diabetic")& 
+                      ((Cell_Type=="GCG")|
+                        (Cell_Type=="INS")|
+                          (Cell_Type=="KRT19")))
+dim(counts)
+dim(anns)
+
+anns <- droplevels(anns)
+
+prop.zeros <- sum(counts==0)/length(counts)
+prop.zeros
+
+filter = apply(counts, 1, function(x) length(x[x>5])>=3)
+
+counts = counts[filter,]
+dim(counts)
+
+prop.zeros <- sum(counts==0)/length(counts)
+prop.zeros
+
+Patient_ID <- anns$Patient_ID
+Cell_Type <- anns$Cell_Type
+Phenotype <- anns$Phenotype
+Batch <- anns$Batch
+```
+
+## Calculate geometric library size, i.e., library size of log-transfromed read counts 
+It is well known that the geometric library size (i.e., library size of log-transfromed read counts) or proportion of expressed genes in each cell explains very large portion of variability of scRNA-Seq data ([Hicks et. al. 2015 BioRxiv](http://biorxiv.org/content/early/2015/08/25/025528), [McDavid et. al. 2016 Nature Biotechnology](http://www.nature.com/nbt/journal/v34/n6/full/nbt.3498.html)). Frequently, the first principal component of log-transformed scRNA-Seq read counts is highly correlated with the geometric library size. (r > 0.9). Here, we calculate it. Later this vector will be used as an known factor in IA-SVA algorithm.
+```{r geno_lib_size, echo=TRUE, fig.width=6, fig.height=4}
+Geo_Lib_Size <- colSums(log(counts+1))
+barplot(Geo_Lib_Size, xlab="Cell")
+lcounts <- log(counts + 1)
+pca.res = svd(lcounts - rowMeans(lcounts))$v
+cor(Geo_Lib_Size, pca.res[,1])
+```
+## Run tSNE to cluster islet cells.
+For comparison purpose, here we applied tSNE on read counts of all genes. We used the Rtsne R package with default settings.
+
+```{r run_tsne, echo=TRUE, fig.width=6, fig.height=6}
+set.seed(323542534)
+tsne.res <- Rtsne(t(lcounts), dims = 2)
+
+plot(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3","blue")[Cell_Type], oma=c(4,4,6,12))
+legend(6, -5, levels(Cell_Type), fill=c("red", "green3", "blue"), bty="n")
+```
+## Run IA-SVA
+Here, we run IA-SVA using Patient_ID and Geo_Lib_Size as known factors and identify hidden factors. 
+```{r run_iasva, echo=TRUE, fig.width= 6, fig.height=5}
+mod <- model.matrix(~Patient_ID+Batch+Geo_Lib_Size)
+iasva.res<- iasva(t(counts), mod[,-1],verbose=FALSE, permute=FALSE, num.sv=4)
+iasva.sv <- iasva.res$sv
+
+pairs(iasva.sv, main="tSNE", pch=21, bg=c("red","green3","blue")[Cell_Type], oma=c(4,4,6,12))
+legend(0.80, 0.6, levels(Cell_Type), fill=c("red", "green3", "blue"), bty="n")
+```
+As shown in the above figure, SV1, SV2 and SV4 separate cells.
+
+
+## Find marker genes for SV1, SV2 and SV4.
+Here, we find marker genes significantly associated with SV1, SV2 and SV4 (multiple testing adjusted p-value < 0.05, default significance cutoff) and having a high R-squared value (R-squared > 0.3) using the find.markers() function.
+```{r find_markers, echo=TRUE, fig.width=6, fig.height=5}
+marker.counts <- find.markers(t(counts), as.matrix(iasva.sv[,c(1,2,4)]))
+nrow(marker.counts)
+
+anno.col <- data.frame(Cell_Type=Cell_Type)
+rownames(anno.col) <- colnames(marker.counts)
+head(anno.col)
+pheatmap(log(marker.counts+1), show_colnames =FALSE, show_rownames = FALSE, clustering_method = "ward.D2",cutree_cols = 3,annotation_col = anno.col)
+```
+
+## Run tSNE post IA-SVA, i.e., run tSNE on maker genes for SV1, SV2 and SV4 obtained from IA-SVA.
+Here, we apply tSNE on the marker genes for SV1, SV2 and SV4 obtained from IA-SVA
+```{r run_tsne_post_iasva, echo=TRUE, fig.width=6, fig.height=6}
+set.seed(3445462)
+tsne.res <- Rtsne(unique(t(log(marker.counts+1))), dims = 2)
+plot(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3","blue")[Cell_Type], oma=c(4,4,6,12))
+legend(7, -8, levels(Cell_Type), fill=c("red", "green3", "blue"), bty="n")
+```
+tSNE post IA-SVA perform better than regular tSNE applied on read counts of entire genes. 
+
+## Session Info
+```{r session_info, echo=TRUE}
+sessionInfo()
+```
