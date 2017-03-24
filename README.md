@@ -20,15 +20,16 @@ To load this package, enter the following command to the R console:
 
 ## View Vignettes
 
-##### Example 1) Detecting hidden heterogeneity in single cell RNA seq data
+After installation, enter each command to the R console to display the vignette rendered in a viewer or click __Quick View__ to view each vignette in a web browser. 
+
+##### Example 1) Detecting hidden heterogeneity in single cell RNA seq data   ([Quick View](http://htmlpreview.github.io/?https://github.com/UcarLab/IA-SVA/blob/master/inst/doc/detecting_hidden_heterogeneity.html))
 
       vignette("detecting_hidden_heterogeneity", package="iasva")
 
-##### Example 2) tSNE post IA-SVA [1]
+##### Example 2) tSNE post IA-SVA [1]   ([Quick View](http://htmlpreview.github.io/?https://github.com/UcarLab/IA-SVA/blob/master/inst/doc/tSNE_post_IA-SVA_3celltypes.html))
 
       vignette("tSNE_post_IA-SVA_3celltypes", package="iasva")  
 
-##### Example 3) tSNE post IA-SVA [2]
+##### Example 3) tSNE post IA-SVA [2]   ([Quick View](http://htmlpreview.github.io/?https://github.com/UcarLab/IA-SVA/blob/master/inst/doc/tSNE_post_IA-SVA_7celltypes.html))
 
       vignette("tSNE_post_IA-SVA_7celltypes", package="iasva")  
-  
