@@ -79,18 +79,18 @@ For comparison purpose, here we applied tSNE on read counts of all genes. We use
 tsne.res <- Rtsne(t(lcounts), dims = 2)
 
 plot(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3","blue","grey","orange","black","purple")[Cell_Type], oma=c(4,4,6,12))
-legend(-30, 20, levels(Cell_Type), fill=c("red", "green3", "blue","grey","orange","black","purple"), bty="n")
+legend(-20, 25, levels(Cell_Type), fill=c("red", "green3", "blue","grey","orange","black","purple"), bty="n")
 ```
 
 ## Run IA-SVA
 Here, we run IA-SVA using Phenotype, Patient_ID, Batch and Geo_Lib_Size as known factors and identify hidden factors. 
-```{r run_iasva, echo=TRUE, fig.width= 6, fig.height=6}
+```{r run_iasva, echo=TRUE, fig.width= 6, fig.height=5}
 mod <- model.matrix(~Phenotype+Patient_ID+Batch+Geo_Lib_Size)
 iasva.res<- iasva(t(counts), mod[,-1],verbose=FALSE, permute=FALSE, num.sv=6)
 iasva.sv <- iasva.res$sv
 
 pairs(iasva.sv, main="tSNE", pch=21, bg=c("red","green3","blue","grey","orange","black","purple")[Cell_Type], oma=c(4,4,6,12))
-legend(0.85, 0.65, levels(Cell_Type), fill=c("red", "green3", "blue","grey","orange","black","purple"), bty="n")
+legend(0.82, 0.65, levels(Cell_Type), fill=c("red", "green3", "blue","grey","orange","black","purple"), bty="n")
 ```
 
 As shown in the above figure, SV1, SV3, SV4 and SV6 separate cells.
@@ -114,7 +114,7 @@ Here, we apply tSNE on the marker genes for SV2 obtained from IA-SVA
 set.seed(75458456)
 tsne.res <- Rtsne(unique(t(log(marker.counts+1))), dims = 2)
 plot(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3","blue","grey","orange","black","purple")[Cell_Type], oma=c(4,4,6,12))
-legend(14, 20, levels(Cell_Type), fill=c("red", "green3", "blue","grey","orange","black","purple"), bty="n")
+legend(12, 22, levels(Cell_Type), fill=c("red", "green3", "blue","grey","orange","black","purple"), bty="n")
 ```
 
 tSNE post IA-SVA perform better than regular tSNE applied on read counts of entire genes. 
