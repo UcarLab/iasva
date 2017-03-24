@@ -21,10 +21,11 @@ find.markers(Y, iasva.sv, method = "BH", sig.cutoff = 0.05,
 \item{verbose}{If verbose=TRUE, the function outputs detailed messages.}
 }
 \value{
-marker.counts The matrix of read counts for markers, one column for each cell.
+marker.counts The read counts matrix of markers, one column for each cell.
 }
 \description{
-find.markers() returns a read counts matrix of markers for each hidden factor detected by IA-SVA.
+find.markers() takes a read counts matrix of entire gene set and a matrix of surrogate variables estimated by IA-SVA as input, 
+identifies marker genes highly correlated with each surrogate variable and returns a read counts matrix of the markers.
 }
 \examples{
 
