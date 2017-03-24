@@ -114,7 +114,7 @@ Here, we apply tSNE on the marker genes for SV2 obtained from IA-SVA
 set.seed(75458456)
 tsne.res <- Rtsne(unique(t(log(marker.counts+1))), dims = 2)
 plot(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3","blue","grey","orange","black","purple")[Cell_Type], oma=c(4,4,6,12))
-legend(12, 22, levels(Cell_Type), fill=c("red", "green3", "blue","grey","orange","black","purple"), bty="n")
+legend(12, 20, levels(Cell_Type), fill=c("red", "green3", "blue","grey","orange","black","purple"), bty="n")
 ```
 
 tSNE post IA-SVA perform better than regular tSNE applied on read counts of entire genes. 
