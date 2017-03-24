@@ -1,5 +1,5 @@
 ---
-title: "IA-SVA based feature selection improves the performance of clustering algorithms (e.g., tSNE)"
+title: "IA-SVA based feature selection improves the performance of clustering algorithms [2]"
 author: "Donghyung Lee"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -10,7 +10,7 @@ vignette: >
 ---
 
 
-The IA-SVA based feature selection can improve the performance of clustering algorithms (e.g., tSNE and hierarchical clustering). To illustrate how the IA-SVA method can be used to improve the performance of clustering algorithms, we use real-world single cell RNA sequencing (scRNA-Seq) data obtained from human pancreatic islet samples ([Lawlor et. al., 2016](http://genome.cshlp.org/content/early/2017/01/16/gr.212720.116)). This dataset is included in a R data package ("iasvaExamples") containing data examples for IA-SVA (https://github.com/dleelab/iasvaExamples). To install the package, follow the instruction provided in the GitHub page.
+The IA-SVA based feature selection can improve the performance of clustering algorithms (e.g., tSNE or hierarchical clustering). To illustrate how the IA-SVA method can be used to improve the performance of clustering algorithms, we use real-world single cell RNA sequencing (scRNA-Seq) data obtained from human pancreatic islet samples ([Lawlor et. al., 2016](http://genome.cshlp.org/content/early/2017/01/16/gr.212720.116)). This dataset is included in a R data package ("iasvaExamples") containing data examples for IA-SVA (https://github.com/dleelab/iasvaExamples). To install the package, follow the instruction provided in the GitHub page.
 
 ## Load packages
 ```{r load_packages, echo=TRUE}
@@ -33,6 +33,7 @@ dim(counts)
 # set seed for the random number generator.
 set.seed(344532456)
 ```
+
 The annotations describing the islet samples and experimental settings are stored in "anns" and the read counts information is stored in "counts". 
 
 ## Filter out low-expressed genes 
@@ -70,6 +71,7 @@ lcounts <- log(counts + 1)
 pca.res = svd(lcounts - rowMeans(lcounts))$v
 cor(Geo_Lib_Size, pca.res[,1])
 ```
+
 ## Run tSNE to cluster islet cells.
 For comparison purpose, here we applied tSNE on read counts of all genes. We used the Rtsne R package with default settings.
 
@@ -79,6 +81,7 @@ tsne.res <- Rtsne(t(lcounts), dims = 2)
 plot(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3","blue","grey","orange","black","purple")[Cell_Type], oma=c(4,4,6,12))
 legend(-30, 20, levels(Cell_Type), fill=c("red", "green3", "blue","grey","orange","black","purple"), bty="n")
 ```
+
 ## Run IA-SVA
 Here, we run IA-SVA using Patient_ID and Geo_Lib_Size as known factors and identify hidden factors. 
 ```{r run_iasva, echo=TRUE, fig.width= 6, fig.height=6}
@@ -113,6 +116,7 @@ tsne.res <- Rtsne(unique(t(log(marker.counts+1))), dims = 2)
 plot(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3","blue","grey","orange","black","purple")[Cell_Type], oma=c(4,4,6,12))
 legend(14, 20, levels(Cell_Type), fill=c("red", "green3", "blue","grey","orange","black","purple"), bty="n")
 ```
+
 tSNE post IA-SVA perform better than regular tSNE applied on read counts of entire genes. 
 
 ## Session Info

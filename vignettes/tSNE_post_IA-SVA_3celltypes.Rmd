@@ -1,5 +1,5 @@
 ---
-title: "IA-SVA based feature selection improves the performance of clustering algorithms (e.g., tSNE)"
+title: "IA-SVA based feature selection improves the performance of clustering algorithms [1]"
 author: "Donghyung Lee"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -33,6 +33,7 @@ dim(counts)
 # set seed for the random number generator.
 set.seed(344532456)
 ```
+
 The annotations describing the islet samples and experimental settings are stored in "anns" and the read counts information is stored in "counts". 
 
 ## Extract three cell types (GCG, INS, KRT19 expressed cells) from non-diabetics and filter out low-expressed genes 
@@ -76,6 +77,7 @@ lcounts <- log(counts + 1)
 pca.res = svd(lcounts - rowMeans(lcounts))$v
 cor(Geo_Lib_Size, pca.res[,1])
 ```
+
 ## Run tSNE to cluster islet cells.
 For comparison purpose, here we applied tSNE on read counts of all genes. We used the Rtsne R package with default settings.
 
@@ -86,6 +88,7 @@ tsne.res <- Rtsne(t(lcounts), dims = 2)
 plot(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3","blue")[Cell_Type], oma=c(4,4,6,12))
 legend(6, -5, levels(Cell_Type), fill=c("red", "green3", "blue"), bty="n")
 ```
+
 ## Run IA-SVA
 Here, we run IA-SVA using Patient_ID and Geo_Lib_Size as known factors and identify hidden factors. 
 ```{r run_iasva, echo=TRUE, fig.width= 6, fig.height=5}
@@ -96,6 +99,7 @@ iasva.sv <- iasva.res$sv
 pairs(iasva.sv, main="tSNE", pch=21, bg=c("red","green3","blue")[Cell_Type], oma=c(4,4,6,12))
 legend(0.80, 0.6, levels(Cell_Type), fill=c("red", "green3", "blue"), bty="n")
 ```
+
 As shown in the above figure, SV1, SV2 and SV4 separate cells.
 
 
@@ -119,6 +123,7 @@ tsne.res <- Rtsne(unique(t(log(marker.counts+1))), dims = 2)
 plot(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3","blue")[Cell_Type], oma=c(4,4,6,12))
 legend(7, -8, levels(Cell_Type), fill=c("red", "green3", "blue"), bty="n")
 ```
+
 tSNE post IA-SVA perform better than regular tSNE applied on read counts of entire genes. 
 
 ## Session Info

@@ -32,11 +32,9 @@ find.markers <- function(Y, iasva.sv, method="BH", sig.cutoff=0.05, rsq.cutoff=0
     cat(paste0("# of markers (",colnames(iasva.sv)[i],"): ", length(markers),"\n"))
     all.markers <- c(all.markers, markers)
   }
-  cat("total # of unique markers: ",length(all.markers))
   all.markers <- unique(all.markers)
-  length(all.markers)
+  cat("total # of unique markers: ",length(all.markers))
   marker.counts <- counts[rownames(counts)%in%all.markers,]
-  dim(marker.counts)
   return(marker.counts)
 }
 
