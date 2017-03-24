@@ -64,7 +64,6 @@ prop.zeros
 
 Patient_ID <- anns$Patient_ID
 Cell_Type <- anns$Cell_Type
-Phenotype <- anns$Phenotype
 Batch <- anns$Batch
 ```
 
@@ -90,7 +89,7 @@ legend(6, -5, levels(Cell_Type), fill=c("red", "green3", "blue"), bty="n")
 ```
 
 ## Run IA-SVA
-Here, we run IA-SVA using Patient_ID and Geo_Lib_Size as known factors and identify hidden factors. 
+Here, we run IA-SVA using Patient_ID, Batch and Geo_Lib_Size as known factors and identify hidden factors. 
 ```{r run_iasva, echo=TRUE, fig.width= 6, fig.height=5}
 mod <- model.matrix(~Patient_ID+Batch+Geo_Lib_Size)
 iasva.res<- iasva(t(counts), mod[,-1],verbose=FALSE, permute=FALSE, num.sv=4)

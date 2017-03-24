@@ -90,7 +90,7 @@ As shown in the above figure, SV2 clearly separates alpha cells into two groups 
 
 ## Find marker genes for the detected heterogeneity (SV2).
 Here, we find marker genes significantly associated with SV2 (multiple testing adjusted p-value < 0.05, default significance cutoff) and having a high R-squared value (R-squared > 0.3, default R-squared cutoff) using the find.markers() function.
-```{r find_markers, echo=TRUE, fig.width=6, fig.height=10}
+```{r find_markers, echo=TRUE, fig.width=8, fig.height=12}
 marker.counts <- find.markers(t(counts), as.matrix(iasva.sv[,2]))
 nrow(marker.counts)
 

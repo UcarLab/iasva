@@ -10,7 +10,7 @@ vignette: >
 ---
 
 
-The IA-SVA based feature selection can improve the performance of clustering algorithms (e.g., tSNE or hierarchical clustering). To illustrate how the IA-SVA method can be used to improve the performance of clustering algorithms, we use real-world single cell RNA sequencing (scRNA-Seq) data obtained from human pancreatic islet samples ([Lawlor et. al., 2016](http://genome.cshlp.org/content/early/2017/01/16/gr.212720.116)). This dataset is included in a R data package ("iasvaExamples") containing data examples for IA-SVA (https://github.com/dleelab/iasvaExamples). To install the package, follow the instruction provided in the GitHub page.
+The IA-SVA based feature selection can improve the performance of clustering algorithms (e.g., tSNE or hierarchical clustering). To illustrate how the IA-SVA method can be used to improve the performance of clustering algorithms, we use real-world single cell RNA sequencing (scRNA-Seq) data obtained from human pancreatic islet samples ([Lawlor et. al., 2016](http://genome.cshlp.org/content/early/2017/01/16/gr.212720.116)). This dataset is included in a R data package ("iasvaExamples") containing data examples for IA-SVA (https://github.com/dleelab/iasvaExamples). To install the 'iasvaExamples' package, follow the instruction provided in the GitHub page.
 
 ## Load packages
 ```{r load_packages, echo=TRUE}
@@ -83,7 +83,7 @@ legend(-30, 20, levels(Cell_Type), fill=c("red", "green3", "blue","grey","orange
 ```
 
 ## Run IA-SVA
-Here, we run IA-SVA using Patient_ID and Geo_Lib_Size as known factors and identify hidden factors. 
+Here, we run IA-SVA using Phenotype, Patient_ID, Batch and Geo_Lib_Size as known factors and identify hidden factors. 
 ```{r run_iasva, echo=TRUE, fig.width= 6, fig.height=6}
 mod <- model.matrix(~Phenotype+Patient_ID+Batch+Geo_Lib_Size)
 iasva.res<- iasva(t(counts), mod[,-1],verbose=FALSE, permute=FALSE, num.sv=6)
