@@ -130,8 +130,10 @@ head(anno.col)
 pheatmap(log(marker.counts+1), show_colnames =FALSE, clustering_method = "ward.D2",cutree_cols = 2,annotation_col = anno.col)
 ```
 
+
+
 ## Run tSNE to detect the hidden heterogeneity.
-For comparison purpose, here we applied tSNE on read counts of all genes to identify the hidden heterogeneity. We used the Rtsne R package with default settings.
+For comparison purposes, we applied tSNE on read counts of all genes to identify the hidden heterogeneity. We used the Rtsne R package with default settings.
 
 ```{r run_tsne, echo=TRUE, fig.width=6, fig.height=5}
 tsne.res <- Rtsne(t(lcounts), dims = 2)
@@ -139,7 +141,7 @@ pairs(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3")[Cell_Type], oma=c(4,
 legend(0.8, 0.55, levels(Cell_Type), fill=c("red", "green3"), bty="n")
 ```
 
-As shown above, tSNE fails to detect the outlier cells that are identified by IA-SVA. Same color coding is used as above. 
+As shown above, tSNE fails to detect the outlier cells that are identified by IA-SVA when all genes are used. Same color coding is used as above. 
 
 ## Run tSNE post IA-SVA analyses, i.e., run tSNE on marker genes associated with SV2 as detected by IA-SVA.
 Here, we apply tSNE on the marker genes for SV2 obtained from IA-SVA
