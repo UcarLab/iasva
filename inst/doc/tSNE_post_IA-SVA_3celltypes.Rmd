@@ -70,7 +70,7 @@ Batch <- anns$Batch
 It is well known that the geometric library size (i.e., library size of log-transfromed read counts) or proportion of expressed genes in each cell explains a very large portion of variability in scRNA-Seq data ([Hicks et. al. 2015 BioRxiv](http://biorxiv.org/content/early/2015/08/25/025528), [McDavid et. al. 2016 Nature Biotechnology](http://www.nature.com/nbt/journal/v34/n6/full/nbt.3498.html)). Frequently, the first principal component of log-transformed scRNA-Seq read counts is highly correlated with the geometric library size (e.g., r > 0.9). Here, we calculate the geometric library size for islet cells, which will be used as an known factor in the IA-SVA analyses. 
 ```{r geno_lib_size, echo=TRUE, fig.width=6, fig.height=4}
 Geo_Lib_Size <- colSums(log(counts+1))
-barplot(Geo_Lib_Size, xlab="Cell")
+barplot(Geo_Lib_Size, xlab="Cell", las=2)
 lcounts <- log(counts + 1)
 pca.res = svd(lcounts - rowMeans(lcounts))$v
 # Note the high correlation between library size and PC1
