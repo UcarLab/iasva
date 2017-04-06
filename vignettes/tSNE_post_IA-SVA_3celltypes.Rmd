@@ -70,7 +70,7 @@ Batch <- anns$Batch
 It is well known that the geometric library size (i.e., library size of log-transfromed read counts) or proportion of expressed genes in each cell explains a very large portion of variability in scRNA-Seq data ([Hicks et. al. 2015 BioRxiv](http://biorxiv.org/content/early/2015/08/25/025528), [McDavid et. al. 2016 Nature Biotechnology](http://www.nature.com/nbt/journal/v34/n6/full/nbt.3498.html)). Frequently, the first principal component of log-transformed scRNA-Seq read counts is highly correlated with the geometric library size (e.g., r > 0.9). Here, we calculate the geometric library size for islet cells, which will be used as an known factor in the IA-SVA analyses. 
 ```{r geno_lib_size, echo=TRUE, fig.width=6, fig.height=4}
 Geo_Lib_Size <- colSums(log(counts+1))
-barplot(Geo_Lib_Size, xlab="Cell", las=2)
+barplot(Geo_Lib_Size, xlab="Cell", las=2, ylab = "Geometric Library Size")
 lcounts <- log(counts + 1)
 pca.res = svd(lcounts - rowMeans(lcounts))$v
 # Note the high correlation between library size and PC1
@@ -84,8 +84,8 @@ Genes are colored with respect to the expression of marker genes.
 set.seed(323542534)
 tsne.res <- Rtsne(t(lcounts), dims = 2)
 
-plot(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3","blue")[Cell_Type], oma=c(4,4,6,12))
-legend(6, -5, levels(Cell_Type), fill=c("red", "green3", "blue"), bty="n")
+plot(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3","blue")[Cell_Type], oma=c(4,4,6,12), cex=2)
+legend("bottomright", levels(Cell_Type), fill=c("red", "green3", "blue"), bty="n")
 ```
 
 ## Run IA-SVA
@@ -97,33 +97,33 @@ mod <- model.matrix(~Patient_ID+Batch+Geo_Lib_Size)
 iasva.res<- iasva(t(counts), mod[,-1],verbose=FALSE, permute=FALSE, num.sv=4)
 iasva.sv <- iasva.res$sv
 
-pairs(iasva.sv, main="tSNE", pch=21, bg=c("red","green3","blue")[Cell_Type], oma=c(4,4,6,12))
+pairs(iasva.sv, main="IA-SVA results", pch=21, bg=c("red","green3","blue")[Cell_Type], oma=c(4,4,6,12))
 legend(0.80, 0.6, levels(Cell_Type), fill=c("red", "green3", "blue"), bty="n")
 ```
 
 As shown in the above figure, the fist two SVs (SV1 and SV2) separate cell types.
 
 ## Find marker genes for SV1 and SV2.
-Here, using the find.markers() function we find marker genes significantly associated with SV1 and SV2 (multiple testing adjusted p-value < 0.05, default significance cutoff, a high R-squared value: R-squared > 0.3).
+Here, using the find.markers() function we find marker genes significantly associated with SV1 and SV2 (multiple testing adjusted p-value < 0.05, default significance cutoff, a high R-squared value: R-squared > 0.4).
 ```{r find_markers, echo=TRUE, fig.width=6, fig.height=5}
-marker.counts <- find.markers(t(counts), as.matrix(iasva.sv[,c(1,2)]))
+marker.counts <- find.markers(t(counts), as.matrix(iasva.sv[,c(1,2)]), rsq.cutoff = 0.4)
 nrow(marker.counts)
 
 anno.col <- data.frame(Cell_Type=Cell_Type)
 rownames(anno.col) <- colnames(marker.counts)
 head(anno.col)
-pheatmap(log(marker.counts+1), show_colnames =FALSE, show_rownames = FALSE, clustering_method = "ward.D2",cutree_cols = 3,annotation_col = anno.col)
+pheatmap(log(marker.counts+1), show_colnames =FALSE, show_rownames = TRUE, clustering_method = "ward.D2",cutree_cols = 3,annotation_col = anno.col)
 ```
 
-This list include 171 genes including INS, GCG, and KRT19. In the case of islet cells, marker genes are well established and IA-SVA did an excellent job of redefining these markers along with some other highly informative genes. Therefore, IA-SVA can be effectively used to uncover heterogeneity associated with cell types and can reveal genes that is expressed in a cell-specific manner and can be used as a marker gene to detect cell types within a population
+This list include 86 genes including INS, GCG, and KRT19. In the case of islet cells, marker genes are well established and IA-SVA did an excellent job of redefining these markers along with some other highly informative genes. Therefore, IA-SVA can be effectively used to uncover heterogeneity associated with cell types and can reveal genes that is expressed in a cell-specific manner and can be used as a marker gene to detect cell types within a population
 of cells. 
 ## Run tSNE post IA-SVA, i.e., run tSNE on marker genes for SV1 and SV2 obtained from IA-SVA.
 Here, we apply tSNE on the marker genes for SV1 and SV2 
 ```{r run_tsne_post_iasva, echo=TRUE, fig.width=6, fig.height=6}
 set.seed(3445462)
 tsne.res <- Rtsne(unique(t(log(marker.counts+1))), dims = 2)
-plot(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3","blue")[Cell_Type], oma=c(4,4,6,12))
-legend(7, -8, levels(Cell_Type), fill=c("red", "green3", "blue"), bty="n")
+plot(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3","blue")[Cell_Type], oma=c(4,4,6,12), cex=2)
+legend("bottomright", levels(Cell_Type), fill=c("red", "green3", "blue"), bty="n")
 ```
 
 tSNE conducted on genes selected via IA-SVA very clearly seperates cells into their corresponding clusters. Moreover, this analyses also revealed
