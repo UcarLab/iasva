@@ -27,14 +27,16 @@ find.markers <- function(Y, iasva.sv, method="BH", sig.cutoff=0.05, rsq.cutoff=0
     fit <- lm(lY~iasva.sv[,i])
     pval.vec <- unlist(lapply(summary(fit), function(x) x$coefficient[2,4]))
     rsq.vec <- unlist(lapply(summary(fit), function(x) x$adj.r.squared))
+    pval.vec[is.na(pval.vec)] <- 1
+    rsq.vec[is.na(rsq.vec)] <- 0
     adj.pval.vec <- p.adjust(pval.vec, method=method, n= length(pval.vec))
-    markers <- rownames(counts)[adj.pval.vec < sig.cutoff & rsq.vec > rsq.cutoff]
+    markers <- colnames(Y)[adj.pval.vec < sig.cutoff & rsq.vec > rsq.cutoff]
     cat(paste0("# of markers (",colnames(iasva.sv)[i],"): ", length(markers),"\n"))
     all.markers <- c(all.markers, markers)
   }
   all.markers <- unique(all.markers)
   cat("total # of unique markers: ",length(all.markers))
-  marker.counts <- counts[rownames(counts)%in%all.markers,]
+  marker.counts <- t(Y[,colnames(Y)%in%all.markers])
   return(marker.counts)
 }
 
