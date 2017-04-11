@@ -35,7 +35,7 @@ set.seed(344532456)
 
 The annotations describing the islet samples and experimental settings are stored in "anns" and the read counts information is stored in "counts". 
 
-## Extract three cell types (GCG (alpha), INS (beta), KRT19 (ductal) expressing cells) from healthy (i.e., non-diabetic) and filter out low-expressed genes 
+## Extract three cell types (GCG (alpha), INS (beta), KRT19 (ductal) expressing cells) from healthy (i.e., non-diabetic) subjects and filter out low-expressed genes 
 ```{r alpha_cells, echo=TRUE, results='asis'}
 counts <- counts[, (anns$Phenotype!="Non-Diabetic")&
                     ((anns$Cell_Type=="GCG")|
@@ -84,7 +84,7 @@ Genes are colored with respect to the expression of marker genes.
 set.seed(323542534)
 tsne.res <- Rtsne(t(lcounts), dims = 2)
 
-plot(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3","blue")[Cell_Type], oma=c(4,4,6,12), cex=2)
+plot(tsne.res$Y, main="tSNE", xlab="tSNE Dim1", ylab="tSNE Dim2", pch=21, bg=c("red","green3","blue")[Cell_Type], oma=c(4,4,6,12))
 legend("bottomright", levels(Cell_Type), fill=c("red", "green3", "blue"), bty="n")
 ```
 
@@ -105,24 +105,25 @@ As shown in the above figure, the fist two SVs (SV1 and SV2) separate cell types
 
 ## Find marker genes for SV1 and SV2.
 Here, using the find.markers() function we find marker genes significantly associated with SV1 and SV2 (multiple testing adjusted p-value < 0.05, default significance cutoff, a high R-squared value: R-squared > 0.4).
-```{r find_markers, echo=TRUE, fig.width=6, fig.height=5}
+```{r find_markers, echo=TRUE, fig.width=8, fig.height=8}
 marker.counts <- find.markers(t(counts), as.matrix(iasva.sv[,c(1,2)]), rsq.cutoff = 0.4)
 nrow(marker.counts)
 
 anno.col <- data.frame(Cell_Type=Cell_Type)
 rownames(anno.col) <- colnames(marker.counts)
 head(anno.col)
-pheatmap(log(marker.counts+1), show_colnames =FALSE, show_rownames = TRUE, clustering_method = "ward.D2",cutree_cols = 3,annotation_col = anno.col)
+pheatmap(log(marker.counts+1), show_colnames =FALSE, show_rownames = TRUE, fontsize_row = 7, clustering_method = "ward.D2",cutree_cols = 3,annotation_col = anno.col)
 ```
 
 This list include 86 genes including INS, GCG, and KRT19. In the case of islet cells, marker genes are well established and IA-SVA did an excellent job of redefining these markers along with some other highly informative genes. Therefore, IA-SVA can be effectively used to uncover heterogeneity associated with cell types and can reveal genes that is expressed in a cell-specific manner and can be used as a marker gene to detect cell types within a population
 of cells. 
+
 ## Run tSNE post IA-SVA, i.e., run tSNE on marker genes for SV1 and SV2 obtained from IA-SVA.
 Here, we apply tSNE on the marker genes for SV1 and SV2 
 ```{r run_tsne_post_iasva, echo=TRUE, fig.width=6, fig.height=6}
 set.seed(3445462)
 tsne.res <- Rtsne(unique(t(log(marker.counts+1))), dims = 2)
-plot(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3","blue")[Cell_Type], oma=c(4,4,6,12), cex=2)
+plot(tsne.res$Y, main="tSNE post IA-SVA", xlab="tSNE Dim1", ylab="tSNE Dim2", pch=21, bg=c("red","green3","blue")[Cell_Type], oma=c(4,4,6,12))
 legend("bottomright", levels(Cell_Type), fill=c("red", "green3", "blue"), bty="n")
 ```
 
