@@ -15,11 +15,8 @@
 #' @param verbose If verbose=TRUE, the function outputs detailed messages. 
 #'
 #' @return sv The matrix of estimated surrogate variables, one column for each surrogate variable. 
-#' @return sv.resid The matrix of residuals. 
 #' @return pc.stat.obs The vector of PC test statistic values, one value for each surrogate variable. 
 #' @return pval The vector of permuation p-values, one value for each surrogate variable.
-#' @return wgt The matrix of gene weights (0-1 normalized R-squared values), one column for each surrogate variable.
-#' @return rsq The matrix of R-squared values, one column for each surrogate variable.
 #' @return n.sv The number of significant/obtained surrogate variables. 
 #' 
 #' @examples
@@ -31,9 +28,7 @@
 
 iasva <- function(Y, X, permute=TRUE, num.p=100, num.sv=NULL, sig.cutoff= 0.05, intercept=TRUE, verbose=FALSE){
   cat("IA-SVA running...")
-  wgt <- NULL
   sv <- NULL
-  sv.resid <- NULL
   pc.stat.obs <- NULL
   pval <- NULL
   rsq <- NULL
@@ -46,10 +41,7 @@ iasva <- function(Y, X, permute=TRUE, num.p=100, num.sv=NULL, sig.cutoff= 0.05, 
     }
     iasva.res <- iasva.unit(Y, X, permute, num.p, intercept, verbose)
     if(iasva.res$pval < sig.cutoff){
-      wgt <- cbind(wgt, iasva.res$wgt)
-      rsq <- cbind(rsq, iasva.res$rsq)
       sv <- cbind(sv, iasva.res$sv)
-      sv.resid <- cbind(sv.resid, iasva.res$sv.resid)
       pc.stat.obs <- cbind(pc.stat.obs, iasva.res$pc.stat.obs)
       pval <- c(pval, iasva.res$pval)
       X <- cbind(X,iasva.res$sv)
@@ -58,10 +50,13 @@ iasva <- function(Y, X, permute=TRUE, num.p=100, num.sv=NULL, sig.cutoff= 0.05, 
     cat(paste0("\nSV",isv, " Detected!"))
   }
   colnames(sv) <- paste0("SV", 1:ncol(sv))
-  colnames(sv.resid) <- paste0("SV", 1:ncol(sv))
-  
-  row.names(wgt) <- NULL
   cat(paste0("\n# of significant surrogate variables: ",length(pval)))
-  return(list(sv=sv, sv.resid=sv.resid, pc.stat.obs=pc.stat.obs, pval=pval, wgt=wgt, rsq=rsq, n.sv=length(pval)))
+  return(list(sv=sv, pc.stat.obs=pc.stat.obs, pval=pval, n.sv=length(pval)))
 }
+
+
+
+
+
+
 
