@@ -11,17 +11,15 @@
 #' @param intercept If intercept=FALSE, the linear intercept is not included in the model.
 #' @param verbose If verbose=TRUE, the function outputs detailed messages. 
 #'
-#' @return sv The matrix of estimated surrogate variables, one column for each surrogate variable. 
-#' @return sv.resid The matrix of residuals. 
-#' @return pc.stat.obs The vector of PC test statistic values, one value for each surrogate variable. 
-#' @return pval The vector of permuation p-values, one value for each surrogate variable.
-#' @return wgt The matrix of gene weights (0-1 normalized R-squared values), one column for each surrogate variable.
-#' @return rsq The matrix of R-squared values, one column for each surrogate variable.
+#' @return sv The estimated surrogate variable.
+#' @return pc.stat.obs The PC test statistic value of the estimated surrogate variable. 
+#' @return pval The permuation p-value of the estimated surrogate variable.
 #' 
 #' @examples
 #' 
 #' @export
 #'
+
 
 iasva.unit <- function(Y, X, permute=TRUE, num.p=100, intercept=TRUE, verbose=FALSE){
   if(min(Y)<0){ Y <- Y + abs(min(Y)) }
@@ -34,7 +32,6 @@ iasva.unit <- function(Y, X, permute=TRUE, num.p=100, intercept=TRUE, verbose=FA
   resid <- resid(fit)
   tresid = t(resid)
   svd_pca <- svd(tresid-rowMeans(tresid))
-  sv.resid <- svd_pca$v[,1]
   if(verbose) {cat("\n Run Linear Regression to Get Rsq")}
   fit <- lm(resid ~ svd_pca$v[,1])
   if(verbose) {cat("\n Get Rsq")}
@@ -69,5 +66,5 @@ iasva.unit <- function(Y, X, permute=TRUE, num.p=100, intercept=TRUE, verbose=FA
   } else {
     pval <- -1
   }
-  return(list(sv=sv, sv.resid=sv.resid, pc.stat.obs=pc.stat.obs, pval=pval, wgt=wgt, rsq=rsq.vec))
+  return(list(sv=sv, pc.stat.obs=pc.stat.obs, pval=pval))
 }
