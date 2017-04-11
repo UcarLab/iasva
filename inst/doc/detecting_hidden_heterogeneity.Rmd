@@ -12,19 +12,16 @@ vignette: >
 
 The iasva package can be used to detect hidden heterogenity within bulk or single cell sequencing data. To illustrate how to use the iasva package for heterogenity detection, we use real-world single cell RNA sequencing (scRNA-Seq) data obtained from human pancreatic islet samples ([Lawlor et. al., 2016](http://genome.cshlp.org/content/early/2017/01/16/gr.212720.116)). This dataset is included in a R data package ("iasvaExamples") containing data examples for IA-SVA (https://github.com/dleelab/iasvaExamples). To install the package, follow the instruction provided in the GitHub page.
 
-## Install packages for the firt use
-```{r install_packages, echo=TRUE}
-#IA-SVA
+## Install packages for the first use
+```{r install_packages, echo=TRUE, eval=FALSE}
+#devtools
 if(!require(devtools)){
         install.packages("devtools")
         library(devtools)
-  }
+}
+#IA-SVA
 install_github("UcarLab/IA-SVA")
 #IAsvaexamples  
-if(!require(devtools)){
-        install.packages("devtools")
-        library(devtools)
-  }
 install_github("dleelab/iasvaExamples")
 
 #SVA
@@ -39,7 +36,7 @@ install.packages("phetmap",repos = "http://cran.us.r-project.org")
 ```
 
 ## Load packages
-```{r load_packages, echo=TRUE}
+```{r load_packages, echo=TRUE, message=FALSE}
 rm(list=ls())
 library(iasva)
 library(iasvaExamples)
@@ -90,7 +87,7 @@ prop.zeros
 It is well known that the geometric library size (i.e., library size of log-transfromed read counts) or proportion of expressed genes in each cell explains a very large portion of variability of scRNA-Seq data ([Hicks et. al. 2015 BioRxiv](http://biorxiv.org/content/early/2015/08/25/025528), [McDavid et. al. 2016 Nature Biotechnology](http://www.nature.com/nbt/journal/v34/n6/full/nbt.3498.html)). Frequently, the first principal component of log-transformed scRNA-Seq read counts is highly correlated with the geometric library size (r ~ 0.9). Here, we calculate the geometric library size vector, which will be used as a known factor in the IA-SVA algorithm.
 ```{r geno_lib_size, echo=TRUE, fig.width=6, fig.height=4}
 Geo_Lib_Size <- colSums(log(counts+1))
-barplot(Geo_Lib_Size, xlab="Cell")
+barplot(Geo_Lib_Size, xlab="Cell", ylab="Geometric Lib Size", las=2)
 lcounts <- log(counts + 1)
 pca.res = svd(lcounts - rowMeans(lcounts))$v
 # PC1 and Geometric library size correlation
@@ -119,7 +116,7 @@ As shown in the above figure, SV2 clearly separates alpha cells into two groups:
 
 
 ## Find marker genes for the detected heterogeneity (SV2).
-Here, using the find.markers() function we find marker genes (n=105 genes) that are significantly associated with SV2 (multiple testing adjusted p-value < 0.05, default significance cutoff, and a high R-squared value (R-squared > 0.3, default R-squared cutoff).  
+Here, using the find.markers() function we find marker genes (n=105 genes) that are significantly associated with SV2 (multiple testing adjusted p-value < 0.05, default significance cutoff, and R-squared value > 0.3, default R-squared cutoff).  
 ```{r find_markers, echo=TRUE, fig.width=8, fig.height=12}
 marker.counts <- find.markers(t(counts), as.matrix(iasva.sv[,2]))
 nrow(marker.counts)
@@ -135,20 +132,24 @@ pheatmap(log(marker.counts+1), show_colnames =FALSE, clustering_method = "ward.D
 ## Run tSNE to detect the hidden heterogeneity.
 For comparison purposes, we applied tSNE on read counts of all genes to identify the hidden heterogeneity. We used the Rtsne R package with default settings.
 
-```{r run_tsne, echo=TRUE, fig.width=6, fig.height=5}
+```{r run_tsne, echo=TRUE, fig.width=6, fig.height=6}
+set.seed(323542534)
 tsne.res <- Rtsne(t(lcounts), dims = 2)
-pairs(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3")[Cell_Type], oma=c(4,4,6,12)) #4,4,6,12
-legend(0.8, 0.55, levels(Cell_Type), fill=c("red", "green3"), bty="n")
+
+plot(tsne.res$Y, main="tSNE", xlab="tSNE Dim1", ylab="tSNE Dim2", pch=21, bg=c("red","green3")[Cell_Type], oma=c(4,4,6,12))
+legend("bottomright", levels(Cell_Type), fill=c("red", "green3"), bty="n")
 ```
 
 As shown above, tSNE fails to detect the outlier cells that are identified by IA-SVA when all genes are used. Same color coding is used as above. 
 
 ## Run tSNE post IA-SVA analyses, i.e., run tSNE on marker genes associated with SV2 as detected by IA-SVA.
 Here, we apply tSNE on the marker genes for SV2 obtained from IA-SVA
-```{r run_tsne_post_iasva, echo=TRUE, fig.width=6, fig.height=5}
+```{r run_tsne_post_iasva, echo=TRUE, fig.width=6, fig.height=6}
+set.seed(345233)
 tsne.res <- Rtsne(unique(t(log(marker.counts+1))), dims = 2)
-pairs(tsne.res$Y, main="tSNE post IA-SVA", pch=21, bg=c("red","green3")[Cell_Type], oma=c(4,4,6,12)) #4,4,6,12
-legend(0.8, 0.55, levels(Cell_Type), fill=c("red", "green3"), bty="n")
+
+plot(tsne.res$Y, main="tSNE post IA-SVA", xlab="tSNE Dim1", ylab="tSNE Dim2", pch=21, bg=c("red","green3")[Cell_Type], oma=c(4,4,6,12))
+legend("bottomright", levels(Cell_Type), fill=c("red", "green3"), bty="n")
 ```
 
 tSNE using SV2 marker genes better seperate these ourlier cells. This analyses suggest that gene selection using IA-SVA combined
@@ -158,6 +159,7 @@ with tSNE analyses can be a powerful way to detect rare cells introducing variab
 Here, we use PCA to detect the hidden heterogeneity (SV2) detected by IA-SVA. 
 ```{r run_pca, echo=TRUE, fig.width=6, fig.height=5}
 pca_res = svd(lcounts - rowMeans(lcounts))$v
+
 pairs(pca.res[,1:3], main="PCA", pch=21, bg=c("red","green3")[Cell_Type], oma=c(4,4,6,12)) #4,4,6,12
 legend(0.8, 0.55, levels(Cell_Type), fill=c("red", "green3"), bty="n")
 ```

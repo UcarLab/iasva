@@ -47,7 +47,7 @@ Batch <- anns$Batch
 
 ## ----geno_lib_size, echo=TRUE, fig.width=6, fig.height=4-----------------
 Geo_Lib_Size <- colSums(log(counts+1))
-barplot(Geo_Lib_Size, xlab="Cell", las=2)
+barplot(Geo_Lib_Size, xlab="Cell", las=2, ylab = "Geometric Library Size")
 lcounts <- log(counts + 1)
 pca.res = svd(lcounts - rowMeans(lcounts))$v
 # Note the high correlation between library size and PC1
@@ -57,31 +57,31 @@ cor(Geo_Lib_Size, pca.res[,1])
 set.seed(323542534)
 tsne.res <- Rtsne(t(lcounts), dims = 2)
 
-plot(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3","blue")[Cell_Type], oma=c(4,4,6,12))
-legend(6, -5, levels(Cell_Type), fill=c("red", "green3", "blue"), bty="n")
+plot(tsne.res$Y, main="tSNE", xlab="tSNE Dim1", ylab="tSNE Dim2", pch=21, bg=c("red","green3","blue")[Cell_Type], oma=c(4,4,6,12))
+legend("bottomright", levels(Cell_Type), fill=c("red", "green3", "blue"), bty="n")
 
 ## ----run_iasva, echo=TRUE, fig.width= 6, fig.height=5--------------------
 mod <- model.matrix(~Patient_ID+Batch+Geo_Lib_Size)
 iasva.res<- iasva(t(counts), mod[,-1],verbose=FALSE, permute=FALSE, num.sv=4)
 iasva.sv <- iasva.res$sv
 
-pairs(iasva.sv, main="tSNE", pch=21, bg=c("red","green3","blue")[Cell_Type], oma=c(4,4,6,12))
+pairs(iasva.sv, main="IA-SVA results", pch=21, bg=c("red","green3","blue")[Cell_Type], oma=c(4,4,6,12))
 legend(0.80, 0.6, levels(Cell_Type), fill=c("red", "green3", "blue"), bty="n")
 
-## ----find_markers, echo=TRUE, fig.width=6, fig.height=5------------------
-marker.counts <- find.markers(t(counts), as.matrix(iasva.sv[,c(1,2)]))
+## ----find_markers, echo=TRUE, fig.width=8, fig.height=8------------------
+marker.counts <- find.markers(t(counts), as.matrix(iasva.sv[,c(1,2)]), rsq.cutoff = 0.4)
 nrow(marker.counts)
 
 anno.col <- data.frame(Cell_Type=Cell_Type)
 rownames(anno.col) <- colnames(marker.counts)
 head(anno.col)
-pheatmap(log(marker.counts+1), show_colnames =FALSE, show_rownames = FALSE, clustering_method = "ward.D2",cutree_cols = 3,annotation_col = anno.col)
+pheatmap(log(marker.counts+1), show_colnames =FALSE, show_rownames = TRUE, fontsize_row = 7, clustering_method = "ward.D2",cutree_cols = 3,annotation_col = anno.col)
 
 ## ----run_tsne_post_iasva, echo=TRUE, fig.width=6, fig.height=6-----------
 set.seed(3445462)
 tsne.res <- Rtsne(unique(t(log(marker.counts+1))), dims = 2)
-plot(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3","blue")[Cell_Type], oma=c(4,4,6,12))
-legend(7, -8, levels(Cell_Type), fill=c("red", "green3", "blue"), bty="n")
+plot(tsne.res$Y, main="tSNE post IA-SVA", xlab="tSNE Dim1", ylab="tSNE Dim2", pch=21, bg=c("red","green3","blue")[Cell_Type], oma=c(4,4,6,12))
+legend("bottomright", levels(Cell_Type), fill=c("red", "green3", "blue"), bty="n")
 
 ## ----session_info, echo=TRUE---------------------------------------------
 sessionInfo()

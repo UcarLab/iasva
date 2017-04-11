@@ -1,28 +1,25 @@
-## ----install_packages, echo=TRUE-----------------------------------------
-#IA-SVA
-if(!require(devtools)){
-        install.packages("devtools")
-        library(devtools)
-  }
-install_github("UcarLab/IA-SVA")
-#IAsvaexamples  
-if(!require(devtools)){
-        install.packages("devtools")
-        library(devtools)
-  }
-install_github("dleelab/iasvaExamples")
+## ----install_packages, echo=TRUE, eval=FALSE-----------------------------
+#  #devtools
+#  if(!require(devtools)){
+#          install.packages("devtools")
+#          library(devtools)
+#  }
+#  #IA-SVA
+#  install_github("UcarLab/IA-SVA")
+#  #IAsvaexamples
+#  install_github("dleelab/iasvaExamples")
+#  
+#  #SVA
+#  source("https://bioconductor.org/biocLite.R")
+#  biocLite("sva")
+#  
+#  # Rtsne
+#  install.packages("Rtsne",repos = "http://cran.us.r-project.org")
+#  
+#  #pheatmap
+#  install.packages("phetmap",repos = "http://cran.us.r-project.org")
 
-#SVA
-source("https://bioconductor.org/biocLite.R")
-biocLite("sva")
-
-# Rtsne
-install.packages("Rtsne",repos = "http://cran.us.r-project.org")
-
-#pheatmap
-install.packages("phetmap",repos = "http://cran.us.r-project.org")
-
-## ----load_packages, echo=TRUE--------------------------------------------
+## ----load_packages, echo=TRUE, message=FALSE-----------------------------
 rm(list=ls())
 library(iasva)
 library(iasvaExamples)
@@ -63,7 +60,7 @@ prop.zeros
 
 ## ----geno_lib_size, echo=TRUE, fig.width=6, fig.height=4-----------------
 Geo_Lib_Size <- colSums(log(counts+1))
-barplot(Geo_Lib_Size, xlab="Cell")
+barplot(Geo_Lib_Size, xlab="Cell", ylab="Geometric Lib Size", las=2)
 lcounts <- log(counts + 1)
 pca.res = svd(lcounts - rowMeans(lcounts))$v
 # PC1 and Geometric library size correlation
@@ -92,18 +89,23 @@ rownames(anno.col) <- colnames(marker.counts)
 head(anno.col)
 pheatmap(log(marker.counts+1), show_colnames =FALSE, clustering_method = "ward.D2",cutree_cols = 2,annotation_col = anno.col)
 
-## ----run_tsne, echo=TRUE, fig.width=6, fig.height=5----------------------
+## ----run_tsne, echo=TRUE, fig.width=6, fig.height=6----------------------
+set.seed(323542534)
 tsne.res <- Rtsne(t(lcounts), dims = 2)
-pairs(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3")[Cell_Type], oma=c(4,4,6,12)) #4,4,6,12
-legend(0.8, 0.55, levels(Cell_Type), fill=c("red", "green3"), bty="n")
 
-## ----run_tsne_post_iasva, echo=TRUE, fig.width=6, fig.height=5-----------
+plot(tsne.res$Y, main="tSNE", xlab="tSNE Dim1", ylab="tSNE Dim2", pch=21, bg=c("red","green3")[Cell_Type], oma=c(4,4,6,12))
+legend("bottomright", levels(Cell_Type), fill=c("red", "green3"), bty="n")
+
+## ----run_tsne_post_iasva, echo=TRUE, fig.width=6, fig.height=6-----------
+set.seed(345233)
 tsne.res <- Rtsne(unique(t(log(marker.counts+1))), dims = 2)
-pairs(tsne.res$Y, main="tSNE post IA-SVA", pch=21, bg=c("red","green3")[Cell_Type], oma=c(4,4,6,12)) #4,4,6,12
-legend(0.8, 0.55, levels(Cell_Type), fill=c("red", "green3"), bty="n")
+
+plot(tsne.res$Y, main="tSNE post IA-SVA", xlab="tSNE Dim1", ylab="tSNE Dim2", pch=21, bg=c("red","green3")[Cell_Type], oma=c(4,4,6,12))
+legend("bottomright", levels(Cell_Type), fill=c("red", "green3"), bty="n")
 
 ## ----run_pca, echo=TRUE, fig.width=6, fig.height=5-----------------------
 pca_res = svd(lcounts - rowMeans(lcounts))$v
+
 pairs(pca.res[,1:3], main="PCA", pch=21, bg=c("red","green3")[Cell_Type], oma=c(4,4,6,12)) #4,4,6,12
 legend(0.8, 0.55, levels(Cell_Type), fill=c("red", "green3"), bty="n")
 

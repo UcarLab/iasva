@@ -50,8 +50,8 @@ cor(Geo_Lib_Size, pca.res[,1])
 ## ----run_tsne, echo=TRUE, fig.width=6, fig.height=6----------------------
 tsne.res <- Rtsne(t(lcounts), dims = 2)
 
-plot(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3","blue","grey","orange","black","purple")[Cell_Type], oma=c(4,4,6,12))
-legend("topright", levels(Cell_Type), fill=c("red", "green3", "blue","grey","orange","black","purple"), bty="n")
+plot(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3","blue","grey","orange","black","purple")[Cell_Type], oma=c(4,4,6,12), cex=1.5)
+legend("topleft", levels(Cell_Type), fill=c("red", "green3", "blue","grey","orange","black","purple"), bty="n")
 
 ## ----run_iasva, echo=TRUE, fig.width= 6, fig.height=5--------------------
 mod <- model.matrix(~Phenotype+Patient_ID+Batch+Geo_Lib_Size)
@@ -68,12 +68,12 @@ nrow(marker.counts)
 anno.col <- data.frame(Cell_Type=Cell_Type)
 rownames(anno.col) <- colnames(marker.counts)
 head(anno.col)
-pheatmap(log(marker.counts+1), show_colnames =FALSE, show_rownames = FALSE, clustering_method = "ward.D2",cutree_cols = 7,annotation_col = anno.col)
+pheatmap(log(marker.counts+1), show_colnames =FALSE, show_rownames = TRUE, clustering_method = "ward.D2",cutree_cols = 7,annotation_col = anno.col)
 
 ## ----run_tsne_post_iasva, echo=TRUE, fig.width=6, fig.height=6-----------
 set.seed(75458456)
 tsne.res <- Rtsne(unique(t(log(marker.counts+1))), dims = 2)
-plot(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3","blue","grey","orange","black","purple")[Cell_Type], oma=c(4,4,6,12))
+plot(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3","blue","grey","orange","black","purple")[Cell_Type], oma=c(4,4,6,12), cex=1.5)
 legend("topright", levels(Cell_Type), fill=c("red", "green3", "blue","grey","orange","black","purple"), bty="n")
 
 ## ----session_info, echo=TRUE---------------------------------------------
