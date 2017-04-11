@@ -11,12 +11,7 @@ To install IA-SVA package and the package with example datasets (iasvaExamples),
             library(devtools)
       }
       install_github("UcarLab/IA-SVA")
-      
-      if(!require(devtools)){
-        install.packages("devtools")
-        library(devtools)
-        }
-     install_github("dleelab/iasvaExamples")
+      install_github("dleelab/iasvaExamples")
 
 
 ## Load the package
