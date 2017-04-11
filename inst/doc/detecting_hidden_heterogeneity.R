@@ -1,3 +1,27 @@
+## ----install_packages, echo=TRUE-----------------------------------------
+#IA-SVA
+if(!require(devtools)){
+        install.packages("devtools")
+        library(devtools)
+  }
+install_github("UcarLab/IA-SVA")
+#IAsvaexamples  
+if(!require(devtools)){
+        install.packages("devtools")
+        library(devtools)
+  }
+install_github("dleelab/iasvaExamples")
+
+#SVA
+source("https://bioconductor.org/biocLite.R")
+biocLite("sva")
+
+# Rtsne
+install.packages("Rtsne",repos = "http://cran.us.r-project.org")
+
+#pheatmap
+install.packages("phetmap",repos = "http://cran.us.r-project.org")
+
 ## ----load_packages, echo=TRUE--------------------------------------------
 rm(list=ls())
 library(iasva)
@@ -28,6 +52,7 @@ anns <- droplevels(anns)
 prop.zeros <- sum(counts==0)/length(counts)
 prop.zeros
 
+# filter out genes that are sparsely and lowly expressed
 filter = apply(counts, 1, function(x) length(x[x>5])>=3)
 
 counts = counts[filter,]
@@ -41,6 +66,7 @@ Geo_Lib_Size <- colSums(log(counts+1))
 barplot(Geo_Lib_Size, xlab="Cell")
 lcounts <- log(counts + 1)
 pca.res = svd(lcounts - rowMeans(lcounts))$v
+# PC1 and Geometric library size correlation
 cor(Geo_Lib_Size, pca.res[,1])
 
 ## ----run_iasva, echo=TRUE, fig.width= 6, fig.height=5--------------------
@@ -53,6 +79,7 @@ plot(iasva.sv[,1], iasva.sv[,2], xlab="SV1", ylab="SV2")
 Cell_Type <- as.factor(iasva.sv[,2] > -0.2) 
 levels(Cell_Type)=c("Cell1","Cell2")
 
+# We identified 6 outlier cells based on SV2 that are marked in red
 pairs(iasva.sv, main="IA-SVA", pch=21, bg=c("red","green3")[Cell_Type], oma=c(4,4,6,12)) #4,4,6,12
 legend(0.8, 0.55, levels(Cell_Type), fill=c("red", "green3"), bty="n")
 

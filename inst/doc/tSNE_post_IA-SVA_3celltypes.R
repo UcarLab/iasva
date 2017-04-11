@@ -47,9 +47,10 @@ Batch <- anns$Batch
 
 ## ----geno_lib_size, echo=TRUE, fig.width=6, fig.height=4-----------------
 Geo_Lib_Size <- colSums(log(counts+1))
-barplot(Geo_Lib_Size, xlab="Cell")
+barplot(Geo_Lib_Size, xlab="Cell", las=2)
 lcounts <- log(counts + 1)
 pca.res = svd(lcounts - rowMeans(lcounts))$v
+# Note the high correlation between library size and PC1
 cor(Geo_Lib_Size, pca.res[,1])
 
 ## ----run_tsne, echo=TRUE, fig.width=6, fig.height=6----------------------
@@ -68,7 +69,7 @@ pairs(iasva.sv, main="tSNE", pch=21, bg=c("red","green3","blue")[Cell_Type], oma
 legend(0.80, 0.6, levels(Cell_Type), fill=c("red", "green3", "blue"), bty="n")
 
 ## ----find_markers, echo=TRUE, fig.width=6, fig.height=5------------------
-marker.counts <- find.markers(t(counts), as.matrix(iasva.sv[,c(1,2,4)]))
+marker.counts <- find.markers(t(counts), as.matrix(iasva.sv[,c(1,2)]))
 nrow(marker.counts)
 
 anno.col <- data.frame(Cell_Type=Cell_Type)

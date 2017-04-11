@@ -9,8 +9,7 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-
-The IA-SVA based feature selection can improve the performance of clustering algorithms (e.g., tSNE or hierarchical clustering). To illustrate how the IA-SVA method can be used to improve the performance of clustering algorithms, we use real-world single cell RNA sequencing (scRNA-Seq) data obtained from human pancreatic islet samples ([Lawlor et. al., 2016](http://genome.cshlp.org/content/early/2017/01/16/gr.212720.116)). This dataset is included in a R data package ("iasvaExamples") containing data examples for IA-SVA (https://github.com/dleelab/iasvaExamples). To install the 'iasvaExamples' package, follow the instruction provided in the GitHub page.
+The IA-SVA based feature selection can significantly improve the performance and utility of clustering algorithms (e.g., tSNE, hierarchical clustering). To illustrate how the IA-SVA method can be used to improve the performance of clustering algorithms, we used real-world single cell RNA sequencing (scRNA-Seq) data obtained from human pancreatic islet samples ([Lawlor et. al., 2016](http://genome.cshlp.org/content/early/2017/01/16/gr.212720.116)). This dataset is included in a R data package ("iasvaExamples") containing data examples for IA-SVA (https://github.com/dleelab/iasvaExamples). To install the 'iasvaExamples' package, follow the instruction provided in the GitHub page.
 
 ## Load packages
 ```{r load_packages, echo=TRUE}
@@ -21,7 +20,7 @@ library(Rtsne)
 library(pheatmap)
 ```
 
-## Load the islet single cell RNA-Seq data
+## Load the islet single cell RNA-Seq data (n=638 cells, and 26K genes)
 ```{r load_data, echo=TRUE}
 data("Lawlor_Islet_scRNAseq_Read_Counts")
 data("Lawlor_Islet_scRNAseq_Annotations")
@@ -36,7 +35,7 @@ set.seed(344532456)
 
 The annotations describing the islet samples and experimental settings are stored in "anns" and the read counts information is stored in "counts". 
 
-## Extract three cell types (GCG, INS, KRT19 expressed cells) from non-diabetics and filter out low-expressed genes 
+## Extract three cell types (GCG (alpha), INS (beta), KRT19 (ductal) expressing cells) from healthy (i.e., non-diabetic) and filter out low-expressed genes 
 ```{r alpha_cells, echo=TRUE, results='asis'}
 counts <- counts[, (anns$Phenotype!="Non-Diabetic")&
                     ((anns$Cell_Type=="GCG")|
@@ -68,18 +67,19 @@ Batch <- anns$Batch
 ```
 
 ## Calculate geometric library size, i.e., library size of log-transfromed read counts 
-It is well known that the geometric library size (i.e., library size of log-transfromed read counts) or proportion of expressed genes in each cell explains very large portion of variability of scRNA-Seq data ([Hicks et. al. 2015 BioRxiv](http://biorxiv.org/content/early/2015/08/25/025528), [McDavid et. al. 2016 Nature Biotechnology](http://www.nature.com/nbt/journal/v34/n6/full/nbt.3498.html)). Frequently, the first principal component of log-transformed scRNA-Seq read counts is highly correlated with the geometric library size. (r > 0.9). Here, we calculate it. Later this vector will be used as an known factor in IA-SVA algorithm.
+It is well known that the geometric library size (i.e., library size of log-transfromed read counts) or proportion of expressed genes in each cell explains a very large portion of variability in scRNA-Seq data ([Hicks et. al. 2015 BioRxiv](http://biorxiv.org/content/early/2015/08/25/025528), [McDavid et. al. 2016 Nature Biotechnology](http://www.nature.com/nbt/journal/v34/n6/full/nbt.3498.html)). Frequently, the first principal component of log-transformed scRNA-Seq read counts is highly correlated with the geometric library size (e.g., r > 0.9). Here, we calculate the geometric library size for islet cells, which will be used as an known factor in the IA-SVA analyses. 
 ```{r geno_lib_size, echo=TRUE, fig.width=6, fig.height=4}
 Geo_Lib_Size <- colSums(log(counts+1))
-barplot(Geo_Lib_Size, xlab="Cell")
+barplot(Geo_Lib_Size, xlab="Cell", las=2)
 lcounts <- log(counts + 1)
 pca.res = svd(lcounts - rowMeans(lcounts))$v
+# Note the high correlation between library size and PC1
 cor(Geo_Lib_Size, pca.res[,1])
 ```
 
 ## Run tSNE to cluster islet cells.
-For comparison purpose, here we applied tSNE on read counts of all genes. We used the Rtsne R package with default settings.
-
+For comparison purposes, we applied tSNE on read counts of all genes. We used the Rtsne R package with default settings for this analyses.
+Genes are colored with respect to the expression of marker genes. 
 ```{r run_tsne, echo=TRUE, fig.width=6, fig.height=6}
 set.seed(323542534)
 tsne.res <- Rtsne(t(lcounts), dims = 2)
@@ -89,7 +89,9 @@ legend(6, -5, levels(Cell_Type), fill=c("red", "green3", "blue"), bty="n")
 ```
 
 ## Run IA-SVA
-Here, we run IA-SVA using Patient_ID, Batch and Geo_Lib_Size as known factors and identify hidden factors. 
+Here, we first run IA-SVA using Patient_ID, Batch and Geo_Lib_Size as known factors and identify 4 hidden factors.
+Since cell type is not used as a known factor in this analyses, IA-SVA will detect the heterogeneity associated with the cell types as a
+known factor.
 ```{r run_iasva, echo=TRUE, fig.width= 6, fig.height=5}
 mod <- model.matrix(~Patient_ID+Batch+Geo_Lib_Size)
 iasva.res<- iasva(t(counts), mod[,-1],verbose=FALSE, permute=FALSE, num.sv=4)
@@ -99,13 +101,12 @@ pairs(iasva.sv, main="tSNE", pch=21, bg=c("red","green3","blue")[Cell_Type], oma
 legend(0.80, 0.6, levels(Cell_Type), fill=c("red", "green3", "blue"), bty="n")
 ```
 
-As shown in the above figure, SV1, SV2 and SV4 separate cells.
+As shown in the above figure, the fist two SVs (SV1 and SV2) separate cell types.
 
-
-## Find marker genes for SV1, SV2 and SV4.
-Here, we find marker genes significantly associated with SV1, SV2 and SV4 (multiple testing adjusted p-value < 0.05, default significance cutoff) and having a high R-squared value (R-squared > 0.3) using the find.markers() function.
+## Find marker genes for SV1 and SV2.
+Here, using the find.markers() function we find marker genes significantly associated with SV1 and SV2 (multiple testing adjusted p-value < 0.05, default significance cutoff, a high R-squared value: R-squared > 0.3).
 ```{r find_markers, echo=TRUE, fig.width=6, fig.height=5}
-marker.counts <- find.markers(t(counts), as.matrix(iasva.sv[,c(1,2,4)]))
+marker.counts <- find.markers(t(counts), as.matrix(iasva.sv[,c(1,2)]))
 nrow(marker.counts)
 
 anno.col <- data.frame(Cell_Type=Cell_Type)
@@ -114,8 +115,10 @@ head(anno.col)
 pheatmap(log(marker.counts+1), show_colnames =FALSE, show_rownames = FALSE, clustering_method = "ward.D2",cutree_cols = 3,annotation_col = anno.col)
 ```
 
-## Run tSNE post IA-SVA, i.e., run tSNE on maker genes for SV1, SV2 and SV4 obtained from IA-SVA.
-Here, we apply tSNE on the marker genes for SV1, SV2 and SV4 obtained from IA-SVA
+This list include 171 genes including INS, GCG, and KRT19. In the case of islet cells, marker genes are well established and IA-SVA did an excellent job of redefining these markers along with some other highly informative genes. Therefore, IA-SVA can be effectively used to uncover heterogeneity associated with cell types and can reveal genes that is expressed in a cell-specific manner and can be used as a marker gene to detect cell types within a population
+of cells. 
+## Run tSNE post IA-SVA, i.e., run tSNE on marker genes for SV1 and SV2 obtained from IA-SVA.
+Here, we apply tSNE on the marker genes for SV1 and SV2 
 ```{r run_tsne_post_iasva, echo=TRUE, fig.width=6, fig.height=6}
 set.seed(3445462)
 tsne.res <- Rtsne(unique(t(log(marker.counts+1))), dims = 2)
@@ -123,7 +126,8 @@ plot(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3","blue")[Cell_Type], om
 legend(7, -8, levels(Cell_Type), fill=c("red", "green3", "blue"), bty="n")
 ```
 
-tSNE post IA-SVA perform better than regular tSNE applied on read counts of entire genes. 
+tSNE conducted on genes selected via IA-SVA very clearly seperates cells into their corresponding clusters. Moreover, this analyses also revealed
+one cell (blue cell clustered together with green cells) that is potentially mislabeled in the original analyses. 
 
 ## Session Info
 ```{r session_info, echo=TRUE}

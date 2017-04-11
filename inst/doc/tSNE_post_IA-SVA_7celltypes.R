@@ -42,7 +42,7 @@ Batch <- anns$Batch
 
 ## ----geno_lib_size, echo=TRUE, fig.width=6, fig.height=4-----------------
 Geo_Lib_Size <- colSums(log(counts+1))
-barplot(Geo_Lib_Size, xlab="Cell")
+barplot(Geo_Lib_Size, xlab="Cell", las =2)
 lcounts <- log(counts + 1)
 pca.res = svd(lcounts - rowMeans(lcounts))$v
 cor(Geo_Lib_Size, pca.res[,1])
@@ -51,7 +51,7 @@ cor(Geo_Lib_Size, pca.res[,1])
 tsne.res <- Rtsne(t(lcounts), dims = 2)
 
 plot(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3","blue","grey","orange","black","purple")[Cell_Type], oma=c(4,4,6,12))
-legend(-20, 25, levels(Cell_Type), fill=c("red", "green3", "blue","grey","orange","black","purple"), bty="n")
+legend("topright", levels(Cell_Type), fill=c("red", "green3", "blue","grey","orange","black","purple"), bty="n")
 
 ## ----run_iasva, echo=TRUE, fig.width= 6, fig.height=5--------------------
 mod <- model.matrix(~Phenotype+Patient_ID+Batch+Geo_Lib_Size)
@@ -62,7 +62,7 @@ pairs(iasva.sv, main="tSNE", pch=21, bg=c("red","green3","blue","grey","orange",
 legend(0.82, 0.65, levels(Cell_Type), fill=c("red", "green3", "blue","grey","orange","black","purple"), bty="n")
 
 ## ----find_markers, echo=TRUE, fig.width=6, fig.height=5------------------
-marker.counts <- find.markers(t(counts), as.matrix(iasva.sv[,c(1,3,4,6)]))
+marker.counts <- find.markers(t(counts), as.matrix(iasva.sv[,c(1,3,4,6)]),  rsq.cutoff = 0.4)
 nrow(marker.counts)
 
 anno.col <- data.frame(Cell_Type=Cell_Type)
@@ -74,7 +74,7 @@ pheatmap(log(marker.counts+1), show_colnames =FALSE, show_rownames = FALSE, clus
 set.seed(75458456)
 tsne.res <- Rtsne(unique(t(log(marker.counts+1))), dims = 2)
 plot(tsne.res$Y, main="tSNE", pch=21, bg=c("red","green3","blue","grey","orange","black","purple")[Cell_Type], oma=c(4,4,6,12))
-legend(12, 20, levels(Cell_Type), fill=c("red", "green3", "blue","grey","orange","black","purple"), bty="n")
+legend("topright", levels(Cell_Type), fill=c("red", "green3", "blue","grey","orange","black","purple"), bty="n")
 
 ## ----session_info, echo=TRUE---------------------------------------------
 sessionInfo()
