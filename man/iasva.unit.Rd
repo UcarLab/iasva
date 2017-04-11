@@ -21,17 +21,11 @@ iasva.unit(Y, X, permute = TRUE, num.p = 100, intercept = TRUE,
 \item{verbose}{If verbose=TRUE, the function outputs detailed messages.}
 }
 \value{
-sv The matrix of estimated surrogate variables, one column for each surrogate variable.
+sv The estimated surrogate variable.
 
-sv.resid The matrix of residuals.
+pc.stat.obs The PC test statistic value of the estimated surrogate variable.
 
-pc.stat.obs The vector of PC test statistic values, one value for each surrogate variable.
-
-pval The vector of permuation p-values, one value for each surrogate variable.
-
-wgt The matrix of gene weights (0-1 normalized R-squared values), one column for each surrogate variable.
-
-rsq The matrix of R-squared values, one column for each surrogate variable.
+pval The permuation p-value of the estimated surrogate variable.
 }
 \description{
 iasva.unit() estimates a hidden factor for unwanted variation while accounting for all known factors and tests the significance 

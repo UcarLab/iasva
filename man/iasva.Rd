@@ -27,15 +27,9 @@ iasva(Y, X, permute = TRUE, num.p = 100, num.sv = NULL,
 \value{
 sv The matrix of estimated surrogate variables, one column for each surrogate variable.
 
-sv.resid The matrix of residuals.
-
 pc.stat.obs The vector of PC test statistic values, one value for each surrogate variable.
 
 pval The vector of permuation p-values, one value for each surrogate variable.
-
-wgt The matrix of gene weights (0-1 normalized R-squared values), one column for each surrogate variable.
-
-rsq The matrix of R-squared values, one column for each surrogate variable.
 
 n.sv The number of significant/obtained surrogate variables.
 }
