@@ -26,7 +26,7 @@
 #' @export
 #'
 
-iasva <- function(Y, X, permute=TRUE, num.p=100, num.sv=NULL, sig.cutoff= 0.05, intercept=TRUE, verbose=FALSE){
+iasva <- function(Y, X, permute=TRUE, num.p=100, num.sv=NULL, sig.cutoff= 0.05, intercept=TRUE, verbose=FALSE, threads=1, useRSS=FALSE, useSVD=FALSE){
   cat("IA-SVA running...")
   sv <- NULL
   pc.stat.obs <- NULL
@@ -39,7 +39,7 @@ iasva <- function(Y, X, permute=TRUE, num.p=100, num.sv=NULL, sig.cutoff= 0.05, 
         break
       }
     }
-    iasva.res <- iasva.unit(Y, X, permute, num.p, intercept, verbose)
+    iasva.res <- iasva.unit(Y, X, permute, num.p, intercept, verbose, threads, useRSS, useSVD)
     if(iasva.res$pval < sig.cutoff){
       sv <- cbind(sv, iasva.res$sv)
       pc.stat.obs <- cbind(pc.stat.obs, iasva.res$pc.stat.obs)
@@ -49,9 +49,14 @@ iasva <- function(Y, X, permute=TRUE, num.p=100, num.sv=NULL, sig.cutoff= 0.05, 
     isv <- isv+1
     cat(paste0("\nSV",isv, " Detected!"))
   }
-  colnames(sv) <- paste0("SV", 1:ncol(sv))
-  cat(paste0("\n# of significant surrogate variables: ",length(pval)))
-  return(list(sv=sv, pc.stat.obs=pc.stat.obs, pval=pval, n.sv=length(pval)))
+
+  if (isv > 0) {
+    colnames(sv) <- paste0("SV", 1:ncol(sv))
+    cat(paste0("\n# of significant surrogate variables: ",length(pval)))
+    return(list(sv=sv, pc.stat.obs=pc.stat.obs, pval=pval, n.sv=length(pval)))
+  } else {
+    cat ("\nNo significant surrogate variables")
+  }
 }
 
 

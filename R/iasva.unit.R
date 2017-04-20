@@ -20,8 +20,10 @@
 #' @export
 #'
 
+library(rARPACK)
+library(parallel)
 
-iasva.unit <- function(Y, X, permute=TRUE, num.p=100, intercept=TRUE, verbose=FALSE){
+iasva.unit <- function(Y, X, permute=TRUE, num.p=100, intercept=TRUE, verbose=FALSE, threads=1, useRSS=FALSE, useSVD=FALSE){
   if(min(Y)<0){ Y <- Y + abs(min(Y)) }
   lY <- log(Y+1)
   if(intercept){
@@ -31,36 +33,79 @@ iasva.unit <- function(Y, X, permute=TRUE, num.p=100, intercept=TRUE, verbose=FA
   }
   resid <- resid(fit)
   tresid = t(resid)
-  svd_pca <- svd(tresid-rowMeans(tresid))
+
+  # ================
+  # Review (SVD)
+  # ================
+  if(useSVD) {
+    svd_pca <- svds(tresid-rowMeans(tresid), 1)
+  } else {
+    svd_pca <- svd(tresid-rowMeans(tresid))
+  }
+  # ================
+  
   if(verbose) {cat("\n Run Linear Regression to Get Rsq")}
   fit <- lm(resid ~ svd_pca$v[,1])
   if(verbose) {cat("\n Get Rsq")}
-  rsq.vec <- unlist(lapply(summary(fit), function(x) x$adj.r.squared))
+
+  # =================
+  # Review (R-Sq)
+  # =================
+  if(useRSS) {
+    rsq.vec <- calc.rss(resid, fit)
+  } else {
+    rsq.vec <- unlist(lapply(summary(fit), function(x) x$adj.r.squared))
+  }
+  # =================
+  
   if(verbose) {cat("\n Rsq 0-1 Normalization")}
   rsq.vec[is.na(rsq.vec)] <- min(rsq.vec, na.rm=TRUE)
   wgt <- (rsq.vec-min(rsq.vec))/(max(rsq.vec)-min(rsq.vec)) #0-1 normalization
   if(verbose) {cat("\n Conduct SVD on weighted log-transformed read counts")}
   tlY = t(lY)*wgt # weigh each row (gene) with respect to its Rsq value.
   
-  sv <- svd(tlY - rowMeans(tlY))$v[,1]
+  # =================
+  # Review (SVD)
+  # =================
+  if(useSVD) {
+    sv <- svds(tlY - rowMeans(tlY), 1)$v[,1]
+  } else {
+    sv <- svd(tlY - rowMeans(tlY))$v[,1]
+  }
   
   if(verbose) {cat("\n Assess the significance of the contribution of SV")}
-  svd.res.obs <- svd(tresid - rowMeans(tresid))
+
+  # =================
+  # Review (SVD)
+  # =================
+  if(useSVD) {
+    svd.res.obs <- svds(tresid - rowMeans(tresid), min(nrow(tresid), ncol(tresid)))
+  } else {
+    svd.res.obs <- svd(tresid - rowMeans(tresid))
+  }
+  # =================
+  
   pc.stat.obs <- svd.res.obs$d[1]^2/sum(svd.res.obs$d^2)
   
   if(permute==TRUE){
     # generate an empirical null distribution of the PC test statistic.
     pc.stat.null.vec <- rep(0, num.p)
-    for(i in 1:num.p){
-      if(verbose) {cat("\n For-Loop: Permute")}
-      permuted.lY <- apply(t(lY), 1, sample, replace=FALSE)
-      if(verbose) {cat("\n For-Loop: Get Residuals")}
-      tresid.null <- t(resid(lm(permuted.lY~X)))
-      if(verbose) {cat("\n For-Loop: Conduct SVD")}
-      svd.res.null <- svd(tresid.null)
-      if(verbose) {cat("\n For-Loop: Compute PC test statistic")}
-      pc.stat.null.vec[i] <- svd.res.null$d[1]^2/sum(svd.res.null$d^2)
+
+    # =====================
+    # Review (Parallel)
+    # =====================
+    permute.svd <- permute.svd.factory(lY, X, verbose, useSVD)
+    if (threads > 1) {
+      threads <- min(threads, detectCores()-1)
+      cl <- makeCluster(threads)
+      pc.stat.null.vec <- tryCatch(parSapply(cl, 1:num.p, permute.svd), error=function(err){stopCluster(cl); stop(err)})
+      stopCluster(cl)
+    } else {
+      pc.stat.null.vec <- sapply(1:num.p, permute.svd)
     }
+    # =======================
+
+    
     if(verbose) {cat("\n Compute permutation p-value")}
     pval <- sum(pc.stat.obs <= pc.stat.null.vec)/(num.p+1)
   } else {
@@ -68,3 +113,42 @@ iasva.unit <- function(Y, X, permute=TRUE, num.p=100, intercept=TRUE, verbose=FA
   }
   return(list(sv=sv, pc.stat.obs=pc.stat.obs, pval=pval))
 }
+
+# ===================
+# Review (RSS)
+# ===================
+calc.rss <- function(resid, fit) {
+    RSS <- colSums(resid(fit)^2)
+    TSS <- colSums(t(t(resid) - colSums(resid)/ncol(resid)) ^ 2)  # vectorized
+    # TSS <- colSums(sweep(resid, 2, mean, "-") ^ 2)  # alt-2
+    return(1-(RSS/(nrow(resid)-2))/(TSS/(nrow(resid)-1)))
+}
+# ===================
+
+# ===================
+# Review (Parallel)
+# ===================
+permute.svd.factory <- function(lY, X, verbose, useSVD) {
+
+  permute.svd <- function(i) {
+    if(verbose) {cat("\n For-Loop: Permute")}
+    permuted.lY <- apply(t(lY), 1, sample, replace=FALSE)
+    if(verbose) {cat("\n For-Loop: Get Residuals")}
+    tresid.null <- t(resid(lm(permuted.lY~X)))
+    if(verbose) {cat("\n For-Loop: Conduct SVD")}
+
+    if(useSVD) {
+      svd.res.null <- svds(tresid.null, 10)
+      #DEBUG print(sum(svd.res.null$d^2))
+    } else {
+      svd.res.null <- svd(tresid.null)
+      #DEBUG print(sum(svd.res.null$d^2))
+    }
+
+    if(verbose) {cat("\n For-Loop: Compute PC test statistic")}
+    return(svd.res.null$d[1]^2/sum(svd.res.null$d^2))
+  }
+
+  return(permute.svd)
+}
+# ===================
