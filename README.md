@@ -2,16 +2,16 @@
 
 Iteratively Adjusted Surrogate Variable Analysis (IA-SVA) is a statistical framework to uncover hidden sources of variation even when these sources are correlated with the biological variable of interest. IA-SVA provides a flexible methodology to i) identify a hidden factor for unwanted heterogeneity while adjusting for all known factors; ii) test the significance of the putative hidden factor for explaining the variation in the data; and iii), if significant, use the estimated factor as an additional known factor in the next iteration to uncover further hidden factors. 
 
+## Citing IA-SVA
+
+__A robust statistical framework to detect multiple sources of hidden variation in single-cell transcriptomes__, Donghyung Lee, Anthony Cheng, Duygu Ucar, bioRxiv. 2017; doi: https://doi.org/10.1101/151217
+
 ## Installation
 
-To install IA-SVA package and the package with example datasets (iasvaExamples), start R and enter the following commands:
+To install IA-SVA package, start R and enter the following commands:
 
-      if(!require(devtools)){
-            install.packages("devtools")
-            library(devtools)
-      }
-      install_github("UcarLab/IA-SVA")
-      install_github("dleelab/iasvaExamples")
+      library(devtools)
+      devtools::install_github("UcarLab/IA-SVA")
 
 
 ## Load the package
@@ -19,7 +19,7 @@ To install IA-SVA package and the package with example datasets (iasvaExamples),
 To load this package, enter the following command to the R console:
 
       library(iasva)
-      library(iasvaExamples)
+
 
 ## View Vignettes
 
@@ -36,3 +36,5 @@ After installation, enter each command to the R console to display the vignette 
 ##### Example 3) tSNE post IA-SVA [2]   ([Quick View](http://htmlpreview.github.io/?https://github.com/UcarLab/IA-SVA/blob/master/inst/doc/tSNE_post_IA-SVA_7celltypes.html))
 
       vignette("tSNE_post_IA-SVA_7celltypes", package="iasva")  
+
+
