@@ -8,25 +8,29 @@ find.markers(Y, iasva.sv, method = "BH", sig.cutoff = 0.05,
   rsq.cutoff = 0.3, verbose = FALSE)
 }
 \arguments{
-\item{Y}{The read counts matrix with samples in row and genes in column.}
+\item{Y}{read counts matrix with samples in row and genes in column.}
 
-\item{iasva.sv}{The matrix of estimated surrogate variables, one column for each surrogate variable.}
+\item{iasva.sv}{matrix of estimated surrogate variables, one column for each surrogate variable.}
 
-\item{method}{The multiple testing adjustment method, default="BH".}
+\item{method}{multiple testing adjustment method, default="BH".}
 
-\item{sig.cutoff}{The cutoff for the significance.}
+\item{sig.cutoff}{significance cutoff.}
 
-\item{rsq.cutoff}{The cutoff for the R squared.}
+\item{rsq.cutoff}{R squared cutoff.}
 
 \item{verbose}{If verbose=TRUE, the function outputs detailed messages.}
 }
 \value{
-marker.counts The read counts matrix of markers, one column for each cell.
+marker.counts read counts matrix of markers, one column for each cell.
 }
 \description{
 find.markers() takes a read counts matrix of entire gene set and a matrix of surrogate variables estimated by IA-SVA as input, 
 identifies marker genes highly correlated with each surrogate variable and returns a read counts matrix of the markers.
 }
 \examples{
+library(iasva)
+data(iasva_test)
+iasva.res <- iasva(iasvaY, iasvaX) 
+markers <- find.markers(iasvaY, iasva.res$sv)
 
 }

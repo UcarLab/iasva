@@ -5,28 +5,32 @@
 #' of its contribution on the unmodeled variation in the data. If the test statistic of detected factor is significant, 
 #' iasva() includes the factor as a known variable in the next iteration to find further hidden factors.  
 #'
-#' @param Y The read counts matrix with samples in row and genes in column.
-#' @param X  The known variables including the primary variables of interest. 
-#' @param permute If permute=TRUE, a permutation test (Buja and Eyuboglu 1992, Leek and Storey 2008) is conducted to assess the significance of the putative hidden factor.
-#' @param num.p The number of permutations that will be used to calculate the permuation test p-value.
-#' @param num.sv The number of surrogate variables to estimate. 
-#' @param sig.cutoff The significance threshold for the permutation test
+#'
+#' @param Y read counts matrix with samples in row and genes in column.
+#' @param X  known variables including the primary variables of interest. 
 #' @param intercept If intercept=FALSE, the linear intercept is not included in the model.
+#' @param num.sv number of surrogate variables to estimate. 
+#' @param permute If permute=TRUE, a permutation test (Buja and Eyuboglu 1992, Leek and Storey 2008) is conducted to assess the significance of the putative hidden factor.
+#' @param num.p number of permutations to be used to calculate the permuation test p-value.
+#' @param sig.cutoff significance threshold for the permutation test
+#' @param threads number of cores to be used in permutation test.
+#' @param num.sv.permtest num of top singluar values to be used in computing the permutation test statistic.
+#' @param tol stopping tolerance for the augmented implicitly restarted Lanczos bidiagonalization algorithm
 #' @param verbose If verbose=TRUE, the function outputs detailed messages. 
 #'
-#' @return sv The matrix of estimated surrogate variables, one column for each surrogate variable. 
-#' @return pc.stat.obs The vector of PC test statistic values, one value for each surrogate variable. 
-#' @return pval The vector of permuation p-values, one value for each surrogate variable.
-#' @return n.sv The number of significant/obtained surrogate variables. 
+#' @return sv matrix of estimated surrogate variables, one column for each surrogate variable. 
+#' @return pc.stat.obs vector of PC test statistic values, one value for each surrogate variable. 
+#' @return pval vector of permuation p-values, one value for each surrogate variable.
+#' @return n.sv number of significant/obtained surrogate variables. 
 #' 
 #' @examples
 #' library(iasva)
 #' data(iasva_test)
-#' iasva(iasvaY, iasvaX)  
+#' iasva.res <- iasva(iasvaY, iasvaX) 
+#'  
 #' @export
-#'
 
-iasva <- function(Y, X, permute=TRUE, num.p=100, num.sv=NULL, sig.cutoff= 0.05, intercept=TRUE, verbose=FALSE){
+iasva <- function(Y, X, intercept=TRUE, num.sv=NULL, permute=TRUE, num.p=100, sig.cutoff= 0.05, threads=1, num.sv.permtest=NULL, tol=1e-15, verbose=FALSE){
   cat("IA-SVA running...")
   sv <- NULL
   pc.stat.obs <- NULL
@@ -39,7 +43,7 @@ iasva <- function(Y, X, permute=TRUE, num.p=100, num.sv=NULL, sig.cutoff= 0.05, 
         break
       }
     }
-    iasva.res <- iasva.unit(Y, X, permute, num.p, intercept, verbose)
+    iasva.res <- iasva.unit(Y, X, intercept, permute, num.p, threads, num.sv.permtest, tol, verbose)
     if(iasva.res$pval < sig.cutoff){
       sv <- cbind(sv, iasva.res$sv)
       pc.stat.obs <- cbind(pc.stat.obs, iasva.res$pc.stat.obs)
@@ -49,11 +53,14 @@ iasva <- function(Y, X, permute=TRUE, num.p=100, num.sv=NULL, sig.cutoff= 0.05, 
     isv <- isv+1
     cat(paste0("\nSV",isv, " Detected!"))
   }
-  colnames(sv) <- paste0("SV", 1:ncol(sv))
-  cat(paste0("\n# of significant surrogate variables: ",length(pval)))
-  return(list(sv=sv, pc.stat.obs=pc.stat.obs, pval=pval, n.sv=length(pval)))
+  if (isv > 0) {
+    colnames(sv) <- paste0("SV", 1:ncol(sv))
+    cat(paste0("\n# of significant surrogate variables: ",length(pval)))
+    return(list(sv=sv, pc.stat.obs=pc.stat.obs, pval=pval, n.sv=length(pval)))
+  } else {
+    cat ("\nNo significant surrogate variables")
+  }
 }
-
 
 
 

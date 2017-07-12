@@ -4,19 +4,22 @@
 #' identifies marker genes highly correlated with each surrogate variable and returns a read counts matrix of the markers.
 #'  
 #'
-#' @param Y The read counts matrix with samples in row and genes in column.
-#' @param iasva.sv  The matrix of estimated surrogate variables, one column for each surrogate variable. 
-#' @param method The multiple testing adjustment method, default="BH".
-#' @param sig.cutoff The cutoff for the significance.
-#' @param rsq.cutoff The cutoff for the R squared.
+#' @param Y read counts matrix with samples in row and genes in column.
+#' @param iasva.sv  matrix of estimated surrogate variables, one column for each surrogate variable. 
+#' @param method multiple testing adjustment method, default="BH".
+#' @param sig.cutoff significance cutoff.
+#' @param rsq.cutoff R squared cutoff.
 #' @param verbose If verbose=TRUE, the function outputs detailed messages. 
 #'
-#' @return marker.counts The read counts matrix of markers, one column for each cell. 
+#' @return marker.counts read counts matrix of markers, one column for each cell. 
 #' 
 #' @examples
+#' library(iasva)
+#' data(iasva_test)
+#' iasva.res <- iasva(iasvaY, iasvaX) 
+#' markers <- find.markers(iasvaY, iasva.res$sv)
 #' 
 #' @export
-#'
 
 find.markers <- function(Y, iasva.sv, method="BH", sig.cutoff=0.05, rsq.cutoff=0.3, verbose=FALSE){
   if(min(Y)<0){ Y <- Y + abs(min(Y)) }

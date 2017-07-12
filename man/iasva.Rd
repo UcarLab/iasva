@@ -4,34 +4,41 @@
 \alias{iasva}
 \title{A function for iteratively adjusted surrogate variable analysis (IA-SVA)}
 \usage{
-iasva(Y, X, permute = TRUE, num.p = 100, num.sv = NULL,
-  sig.cutoff = 0.05, intercept = TRUE, verbose = FALSE)
+iasva(Y, X, intercept = TRUE, num.sv = NULL, permute = TRUE,
+  num.p = 100, sig.cutoff = 0.05, threads = 1, num.sv.permtest = NULL,
+  tol = 1e-15, verbose = FALSE)
 }
 \arguments{
-\item{Y}{The read counts matrix with samples in row and genes in column.}
+\item{Y}{read counts matrix with samples in row and genes in column.}
 
-\item{X}{The known variables including the primary variables of interest.}
+\item{X}{known variables including the primary variables of interest.}
+
+\item{intercept}{If intercept=FALSE, the linear intercept is not included in the model.}
+
+\item{num.sv}{number of surrogate variables to estimate.}
 
 \item{permute}{If permute=TRUE, a permutation test (Buja and Eyuboglu 1992, Leek and Storey 2008) is conducted to assess the significance of the putative hidden factor.}
 
-\item{num.p}{The number of permutations that will be used to calculate the permuation test p-value.}
+\item{num.p}{number of permutations to be used to calculate the permuation test p-value.}
 
-\item{num.sv}{The number of surrogate variables to estimate.}
+\item{sig.cutoff}{significance threshold for the permutation test}
 
-\item{sig.cutoff}{The significance threshold for the permutation test}
+\item{threads}{number of cores to be used in permutation test.}
 
-\item{intercept}{If intercept=FALSE, the linear intercept is not included in the model.}
+\item{num.sv.permtest}{num of top singluar values to be used in computing the permutation test statistic.}
+
+\item{tol}{stopping tolerance for the augmented implicitly restarted Lanczos bidiagonalization algorithm}
 
 \item{verbose}{If verbose=TRUE, the function outputs detailed messages.}
 }
 \value{
-sv The matrix of estimated surrogate variables, one column for each surrogate variable.
+sv matrix of estimated surrogate variables, one column for each surrogate variable.
 
-pc.stat.obs The vector of PC test statistic values, one value for each surrogate variable.
+pc.stat.obs vector of PC test statistic values, one value for each surrogate variable.
 
-pval The vector of permuation p-values, one value for each surrogate variable.
+pval vector of permuation p-values, one value for each surrogate variable.
 
-n.sv The number of significant/obtained surrogate variables.
+n.sv number of significant/obtained surrogate variables.
 }
 \description{
 The iterative procedure of IA-SVA is implemented in this function (iasva). iasva() iteratively runs iasva.unit() function 
@@ -42,5 +49,6 @@ iasva() includes the factor as a known variable in the next iteration to find fu
 \examples{
 library(iasva)
 data(iasva_test)
-iasva(iasvaY, iasvaX)  
+iasva.res <- iasva(iasvaY, iasvaX) 
+ 
 }

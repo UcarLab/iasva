@@ -4,34 +4,37 @@
 \alias{iasva.unit}
 \title{A function for estimating a surrogate variable}
 \usage{
-iasva.unit(Y, X, permute = TRUE, num.p = 100, intercept = TRUE,
-  verbose = FALSE)
+iasva.unit(Y, X, intercept = TRUE, permute = TRUE, num.p = 100,
+  threads = 1, num.sv.permtest = NULL, tol = 1e-15, verbose = FALSE)
 }
 \arguments{
-\item{Y}{The read counts matrix with samples in row and genes in column.}
+\item{Y}{read counts matrix with samples in row and genes in column.}
 
-\item{X}{The known variables including the primary variables of interest.}
+\item{X}{known variables including the primary variables of interest.}
+
+\item{intercept}{If intercept=FALSE, the linear intercept is not included in the model.}
 
 \item{permute}{If permute=TRUE, a permutation test (Buja and Eyuboglu 1992, Leek and Storey 2008) is conducted to assess the significance of the putative hidden factor.}
 
-\item{num.p}{The number of permutations that will be used to calculate the permuation test p-value.}
+\item{num.p}{number of permutations to be used to calculate the permuation test p-value.}
 
-\item{intercept}{If intercept=FALSE, the linear intercept is not included in the model.}
+\item{threads}{number of cores to be used in permutation test.}
+
+\item{num.sv.permtest}{num of top singluar values to be used in computing the permutation test statistic.}
+
+\item{tol}{stopping tolerance for the augmented implicitly restarted Lanczos bidiagonalization algorithm}
 
 \item{verbose}{If verbose=TRUE, the function outputs detailed messages.}
 }
 \value{
-sv The estimated surrogate variable.
+sv estimated surrogate variable.
 
-pc.stat.obs The PC test statistic value of the estimated surrogate variable.
+pc.stat.obs PC test statistic value of the estimated surrogate variable.
 
-pval The permuation p-value of the estimated surrogate variable.
+pval permuation p-value of the estimated surrogate variable.
 }
 \description{
 iasva.unit() estimates a hidden factor for unwanted variation while accounting for all known factors and tests the significance 
 of its contribution on the unmodeled variation in the data. This function is called in iasva() function to iteratively identify hidden 
 factors.
-}
-\examples{
-
 }
