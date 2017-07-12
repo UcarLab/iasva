@@ -30,7 +30,7 @@
 #'  
 #' @export
 
-iasva <- function(Y, X, intercept=TRUE, num.sv=NULL, permute=TRUE, num.p=100, sig.cutoff= 0.05, threads=1, num.sv.permtest=NULL, tol=1e-15, verbose=FALSE){
+iasva <- function(Y, X, intercept=TRUE, num.sv=NULL, permute=TRUE, num.p=100, sig.cutoff= 0.05, threads=1, num.sv.permtest=NULL, tol=1e-10, verbose=FALSE){
   cat("IA-SVA running...")
   sv <- NULL
   pc.stat.obs <- NULL

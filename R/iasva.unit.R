@@ -19,7 +19,7 @@
 #' @return pc.stat.obs PC test statistic value of the estimated surrogate variable. 
 #' @return pval permuation p-value of the estimated surrogate variable.
 
-iasva.unit <- function(Y, X, intercept=TRUE, permute=TRUE, num.p=100, threads=1, num.sv.permtest=NULL, tol=1e-15, verbose=FALSE){
+iasva.unit <- function(Y, X, intercept=TRUE, permute=TRUE, num.p=100, threads=1, num.sv.permtest=NULL, tol=1e-10, verbose=FALSE){
   if(min(Y)<0){ Y <- Y + abs(min(Y)) }
   lY <- log(Y+1)
   if(intercept){
