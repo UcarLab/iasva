@@ -6,7 +6,7 @@
 \usage{
 iasva(Y, X, intercept = TRUE, num.sv = NULL, permute = TRUE,
   num.p = 100, sig.cutoff = 0.05, threads = 1, num.sv.permtest = NULL,
-  tol = 1e-15, verbose = FALSE)
+  tol = 1e-10, verbose = FALSE)
 }
 \arguments{
 \item{Y}{read counts matrix with samples in row and genes in column.}

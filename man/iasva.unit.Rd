@@ -5,7 +5,7 @@
 \title{A function for estimating a surrogate variable}
 \usage{
 iasva.unit(Y, X, intercept = TRUE, permute = TRUE, num.p = 100,
-  threads = 1, num.sv.permtest = NULL, tol = 1e-15, verbose = FALSE)
+  threads = 1, num.sv.permtest = NULL, tol = 1e-10, verbose = FALSE)
 }
 \arguments{
 \item{Y}{read counts matrix with samples in row and genes in column.}
