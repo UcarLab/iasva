@@ -75,7 +75,6 @@ iasva.unit <- function(Y, X, intercept=TRUE, permute=TRUE, num.p=100, threads=1,
     }
     if(verbose) {cat("\n Compute permutation p-value")}
     pval <- sum(pc.stat.obs <= pc.stat.null.vec)/(num.p+1)
-    
   } else {
     pc.stat.obs <- -1
     pval <- -1
