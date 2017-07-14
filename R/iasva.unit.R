@@ -70,7 +70,7 @@ iasva.unit <- function(Y, X, intercept=TRUE, permute=TRUE, num.p=100, threads=1,
       pc.stat.null.vec <- sapply(1:num.p, permute.svd)
     }
     if(verbose) {
-      cat("\n Empirical null distribution of the PC statistic")
+      cat("\n Empirical null distribution of the PC statistic \n")
       print(sort(pc.stat.null.vec))  
     }
     if(verbose) {cat("\n Compute permutation p-value")}
