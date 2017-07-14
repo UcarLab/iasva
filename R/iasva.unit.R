@@ -56,7 +56,9 @@ iasva.unit <- function(Y, X, intercept=TRUE, permute=TRUE, num.p=100, threads=1,
     } else {
       svd.res.obs <- irlba::irlba(tresid-rowMeans(tresid), num.sv.permtest, tol=tol)
     }
+
     pc.stat.obs <- svd.res.obs$d[1]^2/sum(svd.res.obs$d^2)
+    if(verbose) {cat("\n PC test statistic value:", pc.stat.obs)}
     
     # Generate an empirical null distribution of the PC test statistic.
     pc.stat.null.vec <- rep(0, num.p)
@@ -69,12 +71,9 @@ iasva.unit <- function(Y, X, intercept=TRUE, permute=TRUE, num.p=100, threads=1,
     } else {
       pc.stat.null.vec <- sapply(1:num.p, permute.svd)
     }
-    if(verbose) {
-      cat("\n Empirical null distribution of the PC statistic \n")
-      print(sort(pc.stat.null.vec))  
-    }
-    if(verbose) {cat("\n Compute permutation p-value")}
+    if(verbose) {cat("\n Empirical null distribution of the PC statistic:", sort(pc.stat.null.vec))}
     pval <- sum(pc.stat.obs <= pc.stat.null.vec)/(num.p+1)
+    if(verbose) {cat("\n Permutation p-value:", pval)}
   } else {
     pc.stat.obs <- -1
     pval <- -1
@@ -111,17 +110,13 @@ calc.rsq <- function(resid, fit) {
 permute.svd.factory <- function(lY, X, num.sv.permtest, tol, verbose) {
   
   permute.svd <- function(i) {
-    if(verbose) {cat("\n For-Loop: Permute")}
     permuted.lY <- apply(t(lY), 1, sample, replace=FALSE)
-    if(verbose) {cat("\n For-Loop: Get Residuals")}
     tresid.null <- t(resid(.lm.fit(cbind(1,X), permuted.lY)))
-    if(verbose) {cat("\n For-Loop: Conduct SVD")}
     if(is.null(num.sv.permtest)) {
       svd.res.null <- svd(tresid.null)
     } else {
       svd.res.null <- irlba::irlba(tresid.null, num.sv.permtest, tol=tol)
     }
-    if(verbose) {cat("\n For-Loop: Compute PC test statistic")}
     return(svd.res.null$d[1]^2/sum(svd.res.null$d^2))
   }
   
