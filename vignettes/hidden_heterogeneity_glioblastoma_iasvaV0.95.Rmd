@@ -1,0 +1,200 @@
+---
+title: "Detecting cell-cycle stage difference in glioblastoma cells"
+author: "Donghyung Lee"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+Here, we illustrate how to use the iasva package to detect cell cycle stage difference within single cell RNA sequencing data. We use single cell RNA sequencing (scRNA-Seq) data obtained from human glioblastoma samples ([Petel et. al., 2014](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4123637/)). This dataset is included in a R data package ("iasvaExamples") containing data examples for IA-SVA (https://github.com/dleelab/iasvaExamples). To install the package, follow the instruction provided in the GitHub page.
+
+## Install packages
+```{r install_packages, echo=TRUE, eval=FALSE}
+#devtools
+library(devtools)
+#iasva
+devtools::install_github("UcarLab/IA-SVA")
+#iasvaExamples  
+devtools::install_github("dleelab/iasvaExamples")
+```
+
+## Load packages
+```{r load_packages, echo=TRUE, message=FALSE}
+rm(list=ls())
+library(irlba) # partial SVD, the augmented implicitly restarted Lanczos bidiagonalization algorithm
+library(iasva)
+library(iasvaExamples)
+library(sva)
+library(Rtsne)
+library(pheatmap)
+library(corrplot)
+library(DescTools) #pcc i.e., Pearson's contingency coefficient
+library(RColorBrewer)
+
+color.vec <- brewer.pal(3, "Set1")
+```
+
+## Load the glioblastoma single cell RNA-Seq data
+```{r load_data, echo=TRUE}
+data("Patel_Glioblastoma_scRNAseq_Read_Counts")
+data("Patel_Glioblastoma_scRNAseq_Annotations")
+ls()
+counts <- Patel_Glioblastoma_scRNAseq_Read_Counts
+anns <- Patel_Glioblastoma_scRNAseq_Annotations
+dim(anns)
+dim(counts)
+
+summary(anns)
+table(anns$patient_id, anns$subtype)
+ContCoef(table(anns$patient_id, anns$subtype))
+```
+
+The annotations describing the glioblastoma samples and experimental settings are stored in "anns" and the read counts information is stored in "counts". 
+
+## Extract glioblastoma cells from Patient MGH30 
+We use read counts of glioblastoma cells from Patient MGH30 (n = 58).   
+```{r MGH30_cells, echo=TRUE, results='asis'}
+counts <- counts[, (anns$subtype!="None")&(anns$patient_id=="MGH30")] 
+anns <- subset(anns, (subtype!="None")&(patient_id=="MGH30"))
+dim(counts)
+dim(anns)
+
+anns <- droplevels(anns)
+
+prop.zeros <- sum(counts==0)/length(counts)
+prop.zeros
+
+# filter out genes that are sparsely and lowly expressed
+filter = apply(counts, 1, function(x) length(x[x>5])>=3)
+
+counts = counts[filter,]
+dim(counts)
+
+prop.zeros <- sum(counts==0)/length(counts)
+prop.zeros
+
+
+Subtype <- anns$subtype
+Patient_ID <- anns$patient_id
+```
+
+## Calculate geometric library size, i.e., library size of log-transfromed read counts 
+It is well known that the geometric library size (i.e., library size of log-transfromed read counts) or proportion of expressed genes in each cell explains a very large portion of variability of scRNA-Seq data ([Hicks et. al. 2015 BioRxiv](http://biorxiv.org/content/early/2015/08/25/025528), [McDavid et. al. 2016 Nature Biotechnology](http://www.nature.com/nbt/journal/v34/n6/full/nbt.3498.html)). Frequently, the first principal component of log-transformed scRNA-Seq read counts is highly correlated with the geometric library size (r ~ 0.9). Here, we calculate the geometric library size vector, which will be used as a known factor in the IA-SVA algorithm.
+```{r geno_lib_size, echo=TRUE, fig.width=7, fig.height=4}
+Geo_Lib_Size <- colSums(log(counts+1))
+barplot(Geo_Lib_Size, xlab="Cell", ylab="Geometric Lib Size", las=2)
+lcounts <- log(counts + 1)
+pc1 = irlba(lcounts - rowMeans(lcounts), 1)$v[,1] ## partial SVD
+cor(Geo_Lib_Size, pc1)
+```
+
+
+## Run IA-SVA
+Here, we run IA-SVA using Geo_Lib_Size as a known factor and identify five hidden factors. 
+SVs are plotted in a pairwise fashion to uncover which SVs can seperate cells. 
+```{r run_iasva, echo=TRUE, fig.width= 7, fig.height=6}
+set.seed(345)
+mod <- model.matrix(~Geo_Lib_Size)
+iasva.res<- iasva(t(counts), mod[,-1],verbose=FALSE, permute=FALSE, num.sv=5) ## irlba
+iasva.sv <- iasva.res$sv
+
+Cell_Cycle <- as.factor(iasva.sv[,2] > -0.1) 
+levels(Cell_Cycle)=c("Cycle1","Cycle2")
+table(Cell_Cycle)
+
+pairs(iasva.sv[,1:5], main="IA-SVA", pch=21, col=color.vec[Cell_Cycle], bg=color.vec[Cell_Cycle], oma=c(4,4,6,14))
+legend("right", levels(Cell_Cycle), fill=color.vec, bty="n")
+
+plot(iasva.sv[,1:2], main="IA-SVA", pch=21, xlab="SV1", ylab="SV2", col=color.vec[Cell_Cycle], bg=color.vec[Cell_Cycle])
+#legend("bottomright", levels(Cell_Cycle), fill=color.vec, bty="n")
+
+cor(Geo_Lib_Size, iasva.sv[,2])
+
+corrplot(cor(iasva.sv))
+```
+
+As shown in the above figure, SV2 clearly separates glioblastoma cells into two groups: 12 cells (marked in red) and the rest of the cells (marked in blue). Note that SV2 is moderately correlated with the geometric library size (|r|=0.49). SV5 also captures an outlier cell. However, we will focus on SV2 in the rest of the analyses.
+
+
+## Find marker genes for the detected heterogeneity (SV2).
+Here, using the find.markers() function we find marker genes (n=87 genes) that are significantly associated with SV2 (multiple testing adjusted p-value < 0.05, default significance cutoff, and R-squared value > 0.4).  
+```{r find_markers, echo=TRUE, fig.width=7, fig.height=12}
+marker.counts <- find.markers(t(counts), as.matrix(iasva.sv[,2]), rsq.cutoff = 0.4)
+nrow(marker.counts) #87 58
+rownames(marker.counts)
+anno.col <- data.frame(Subtype=Subtype, Cell_Cycle=Cell_Cycle, Lib_Size=colSums(counts))
+rownames(anno.col) <- colnames(marker.counts)
+head(anno.col)
+
+pheatmap(log(marker.counts+1), show_colnames =FALSE, clustering_method = "ward.D2",cutree_cols = 2,annotation_col = anno.col)
+```
+Theses marker genes are strongly enriched in cell-cycle related Go terms and KEGG pathways. (See Supplementary Figure 6 in https://doi.org/10.1101/151217) 
+
+
+## Run tSNE to detect the hidden heterogeneity.
+For comparison purposes, we applied tSNE on read counts of all genes to identify the hidden heterogeneity. We used the Rtsne R package with default settings.
+
+```{r run_tsne, echo=TRUE, fig.width=7, fig.height=7}
+set.seed(323542534)
+tsne.res <- Rtsne(t(lcounts), dims = 2, perplexity = 15)
+
+plot(tsne.res$Y, main="tSNE", xlab="tSNE Dim1", ylab="tSNE Dim2", pch=21, col=color.vec[Cell_Cycle], bg=color.vec[Cell_Cycle], oma=c(4,4,6,12))
+legend("bottomright", levels(Cell_Cycle), fill=color.vec, bty="n")
+```
+
+
+As shown above, tSNE fails to detect the outlier cells that are identified by IA-SVA when all genes are used. Same color coding is used as above. 
+
+## Run tSNE post IA-SVA analyses, i.e., run tSNE on marker genes associated with SV2 as detected by IA-SVA.
+Here, we apply tSNE on the marker genes for SV2 obtained from IA-SVA
+```{r run_tsne_post_iasva, echo=TRUE, fig.width=7, fig.height=7}
+set.seed(34523)
+tsne.res <- Rtsne(unique(t(log(marker.counts+1))), dims = 2, perplexity = 15)
+
+plot(tsne.res$Y, main="tSNE post IA-SVA", xlab="tSNE Dim1", ylab="tSNE Dim2", pch=21, col=color.vec[Cell_Cycle], bg=color.vec[Cell_Cycle], oma=c(4,4,6,12))
+legend("bottomright", levels(Cell_Cycle), fill=color.vec, bty="n")
+```
+
+## Run principal component analysis (PCA) to detect the hidden heterogeneity (SV2).
+Here, we use PCA to detect the cell cycle stage difference (SV2) detected by IA-SVA.
+```{r pca_plot, echo=TRUE, fig.width=7, fig.height=6}
+pca.res = irlba(lcounts - rowMeans(lcounts), 5)$v ## partial SVD
+
+pairs(pca.res[,1:5], main="PCA", pch=21, col=color.vec[Cell_Cycle], bg=color.vec[Cell_Cycle],
+      oma=c(4,4,6,14))
+legend("right", levels(Cell_Cycle), fill=color.vec, bty="n")
+
+plot(pca.res[,1:2], main="PCA", pch=21, xlab="PC1", ylab="PC2", col=color.vec[Cell_Cycle], bg=color.vec[Cell_Cycle])
+```
+PCA failed to capture the heterogeneity.
+
+## Run surrogate variable analysis (SVA) to detect the hidden heterogeneity (SV2).
+Here, for comparison purposes we use SVA to detect the hidden heterogeneity in our example data. 
+```{r run_sva, echo=TRUE, fig.width=7, fig.height=6}
+mod1 <- model.matrix(~Geo_Lib_Size)
+mod0 <- cbind(mod1[,1])
+
+sva.res = svaseq(counts,mod1,mod0, n.sv=5)$sv
+
+pairs(sva.res[,1:5], main="SVA", pch=21, col=color.vec[Cell_Cycle], bg=color.vec[Cell_Cycle], oma=c(4,4,6,12)) #4,4,6,12
+legend("right", levels(Cell_Cycle), fill=color.vec, bty="n")
+
+plot(sva.res[,1:2], main="SVA", xlab="SV1", ylab="SV2", pch=21, col=color.vec[Cell_Cycle], bg=color.vec[Cell_Cycle])
+```
+SVA failed to detect the cell cycle stage difference.
+
+## Correlation between SV2 and the geometric library size
+```{r SV2_geometric_lib_size, echo=TRUE}
+cor(Geo_Lib_Size, iasva.sv[,2])
+```
+By allowing correlation between factors, IA-SVA accurately detects the cell cycle stage difference, which is moderately correlated (|r|=0.49) with the geometric library size (the first principal component). Existing methods fail to detect the heterogeneity due to the orthogonality assumption.
+
+
+## Session Info
+```{r session_info, echo=TRUE}
+sessionInfo()
+```
