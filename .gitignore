@@ -3,3 +3,4 @@
 .RData
 .Ruserdata
 .vignettes_temp
+.inst/doc
