@@ -6,6 +6,10 @@ Iteratively Adjusted Surrogate Variable Analysis (IA-SVA) is a statistical frame
 
 __A robust statistical framework to detect multiple sources of hidden variation in single-cell transcriptomes__, Donghyung Lee, Anthony Cheng, Duygu Ucar, bioRxiv. 2017; doi: https://doi.org/10.1101/151217
 
+## Author
+
+Donghyung Lee <donghyung.lee@jax.org> and Anthony Cheng <anthony.cheng@jax.org>
+
 ## Installation
 
 To install IA-SVA package, start R and enter the following commands:
