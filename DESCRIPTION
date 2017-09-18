@@ -1,13 +1,25 @@
 Package: iasva
 Title: Iteratively Adjusted Surrogate Variable Analysis
-Version: 1.0
-Date: 2017-01-16
-Author: Donghyung Lee <Donghyung.Lee@jax.org>,
-    Anthony Cheng <Anthony.Cheng@jax.org>, Duygu Ucar <Duygu.Ucar@jax.org>
-Maintainer: Donghyung Lee <Donghyung.Lee@jax.org>,
-    Anthony Cheng <Anthony.Cheng@jax.org>
-Description: IA-SVA can be used to uncover hidden heterogeneity in bulk and single cell transcriptomic data.
+Version: 0.95
+Date: 2017-07-12
+Author: Donghyung Lee <Donghyung.Lee@jax.org>, Anthony Cheng <Anthony.Cheng@jax.org>
+Maintainer: Donghyung Lee <Donghyung.Lee@jax.org>, Anthony Cheng <Anthony.Cheng@jax.org>
+Description: Iteratively Adjusted Surrogate Variable Analysis (IA-SVA) is a
+    statistical framework to uncover hidden sources of variation even when these
+    sources are correlated. IA-SVA provides a flexible methodology to i) identify a
+    hidden factor for unwanted heterogeneity while adjusting for all known factors;
+    ii) test the significance of the putative hidden factor for explaining the
+    unmodeled variation in the data; and iii), if significant, use the estimated factor as an
+    additional known factor in the next iteration to uncover further hidden factors.
+Depends: 
+    R (>= 3.2),
+Imports:
+    irlba,
+    parallel
 License: GPL-2
 biocViews: Preprocessing, QualityControl, BatchEffect
-Suggests: knitr, rmarkdown
+Suggests:
+    knitr,
+    rmarkdown
 VignetteBuilder: knitr
+RoxygenNote: 6.0.1

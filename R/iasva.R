@@ -1,62 +1,38 @@
-iasva.unit <- function(Y, X, permute=TRUE, num.p=100, intercept=TRUE, verbose=FALSE){
-  if(min(Y)<0){ Y <- Y + abs(min(Y)) }
-  lY <- log(Y+1)
-  if(intercept){
-    fit <- lm(lY~X)
-  } else {
-    fit <- lm(lY~X-1)
-  }
-  resid <- resid(fit)
-  tresid = t(resid)
-  #svd_pca <- svd(tresid)
-  svd_pca <- svd(tresid-rowMeans(tresid))
-  sv.resid <- svd_pca$v[,1]
-  if(verbose) {cat("\n Run Linear Regression to Get Rsq")}
-  fit <- lm(resid ~ svd_pca$v[,1])
-  if(verbose) {cat("\n Get Rsq")}
-  rsq.vec <- unlist(lapply(summary(fit), function(x) x$adj.r.squared))
-  if(verbose) {cat("\n Rsq 0-1 Normalization")}
-  rsq.vec[is.na(rsq.vec)] <- min(rsq.vec, na.rm=TRUE)
-  wgt <- (rsq.vec-min(rsq.vec))/(max(rsq.vec)-min(rsq.vec)) #0-1 normalization
-  ##plot(wgt)
-  if(verbose) {cat("\n Conduct SVD on weighted log-transformed read counts")}
-  tlY = t(lY)*wgt # weight each row using normalized rsq values
-  
-  sv <- svd(tlY - rowMeans(tlY))$v[,1]
-  #svs <- svd(tlY - rowMeans(tlY))$v
-  #max.index <- which.max(cor(svs, sv.resid))
-  #sv <- svs[,max.index]
-  
-  if(verbose) {cat("\n Assess the significance of the contribution of SV")}
-  svd.res.obs <- svd(tresid - rowMeans(tresid))
-  pc.stat.obs <- svd.res.obs$d[1]^2/sum(svd.res.obs$d^2)
-  
-  if(permute==TRUE){
-    ## test significance here
-    pc.stat.null.vec <- rep(0, num.p)
-    for(i in 1:num.p){
-      if(verbose) {cat("\n For-Loop: Permute")}
-      permuted.lY <- apply(t(lY), 1, sample, replace=FALSE)
-      if(verbose) {cat("\n For-Loop: Get Residuals")}
-      tresid.null <- t(resid(lm(permuted.lY~X)))
-      if(verbose) {cat("\n For-Loop: Conduct SVD")}
-      svd.res.null <- svd(tresid.null)
-      if(verbose) {cat("\n For-Loop: Get PC test statistic")}
-      pc.stat.null.vec[i] <- svd.res.null$d[1]^2/sum(svd.res.null$d^2)
-    }
-    if(verbose) {cat("\n Get permutation p-value")}
-    pval <- sum(pc.stat.obs <= pc.stat.null.vec)/(num.p+1)
-  } else {
-    pval <- -1
-  }
-  return(list(sv=sv, sv.resid=sv.resid, pc.stat.obs=pc.stat.obs, pval=pval, wgt=wgt, rsq=rsq.vec))
-}
+#' A function for iteratively adjusted surrogate variable analysis (IA-SVA)
+#'
+#' The iterative procedure of IA-SVA is implemented in this function (iasva). iasva() iteratively runs iasva.unit() function 
+#' to identify a hidden factor for unwanted variation while accounting for all known factors and test the significance 
+#' of its contribution on the unmodeled variation in the data. If the test statistic of detected factor is significant, 
+#' iasva() includes the factor as a known variable in the next iteration to find further hidden factors.  
+#'
+#'
+#' @param Y read counts matrix with samples in row and genes in column.
+#' @param X  known variables including the primary variables of interest. 
+#' @param intercept If intercept=FALSE, the linear intercept is not included in the model.
+#' @param num.sv number of surrogate variables to estimate. 
+#' @param permute If permute=TRUE, a permutation test (Buja and Eyuboglu 1992, Leek and Storey 2008) is conducted to assess the significance of the putative hidden factor.
+#' @param num.p number of permutations to be used to calculate the permuation test p-value.
+#' @param sig.cutoff significance threshold for the permutation test
+#' @param threads number of cores to be used in permutation test.
+#' @param num.sv.permtest num of top singluar values to be used in computing the permutation test statistic.
+#' @param tol stopping tolerance for the augmented implicitly restarted Lanczos bidiagonalization algorithm
+#' @param verbose If verbose=TRUE, the function outputs detailed messages. 
+#'
+#' @return sv matrix of estimated surrogate variables, one column for each surrogate variable. 
+#' @return pc.stat.obs vector of PC test statistic values, one value for each surrogate variable. 
+#' @return pval vector of permuation p-values, one value for each surrogate variable.
+#' @return n.sv number of significant/obtained surrogate variables. 
+#' 
+#' @examples
+#' library(iasva)
+#' data(iasva_test)
+#' iasva.res <- iasva(iasvaY, iasvaX) 
+#'  
+#' @export
 
-iasva <- function(Y, X, permute=TRUE, num.p=100, num.sv=NULL, sig.cutoff= 0.05, intercept=TRUE, verbose=FALSE){
+iasva <- function(Y, X, intercept=TRUE, num.sv=NULL, permute=TRUE, num.p=100, sig.cutoff= 0.05, threads=1, num.sv.permtest=NULL, tol=1e-10, verbose=FALSE){
   cat("IA-SVA running...")
-  wgt <- NULL
   sv <- NULL
-  sv.resid <- NULL
   pc.stat.obs <- NULL
   pval <- NULL
   rsq <- NULL
@@ -67,12 +43,9 @@ iasva <- function(Y, X, permute=TRUE, num.p=100, num.sv=NULL, sig.cutoff= 0.05, 
         break
       }
     }
-    iasva.res <- iasva.unit(Y, X, permute, num.p, intercept, verbose)
+    iasva.res <- iasva.unit(Y, X, intercept, permute, num.p, threads, num.sv.permtest, tol, verbose)
     if(iasva.res$pval < sig.cutoff){
-      wgt <- cbind(wgt, iasva.res$wgt)
-      rsq <- cbind(rsq, iasva.res$rsq)
       sv <- cbind(sv, iasva.res$sv)
-      sv.resid <- cbind(sv.resid, iasva.res$sv.resid)
       pc.stat.obs <- cbind(pc.stat.obs, iasva.res$pc.stat.obs)
       pval <- c(pval, iasva.res$pval)
       X <- cbind(X,iasva.res$sv)
@@ -80,8 +53,17 @@ iasva <- function(Y, X, permute=TRUE, num.p=100, num.sv=NULL, sig.cutoff= 0.05, 
     isv <- isv+1
     cat(paste0("\nSV",isv, " Detected!"))
   }
-  row.names(wgt) <- NULL
-  cat(paste0("\n# of significant surrogate variables: ",length(pval)))
-  return(list(sv=sv, sv.resid=sv.resid, pc.stat.obs=pc.stat.obs, pval=pval, wgt=wgt, rsq=rsq, n.sv=length(pval)))
+  if (isv > 0) {
+    colnames(sv) <- paste0("SV", 1:ncol(sv))
+    cat(paste0("\n# of significant surrogate variables: ",length(pval)))
+    return(list(sv=sv, pc.stat.obs=pc.stat.obs, pval=pval, n.sv=length(pval)))
+  } else {
+    cat ("\nNo significant surrogate variables")
+  }
 }
+
+
+
+
+
 
