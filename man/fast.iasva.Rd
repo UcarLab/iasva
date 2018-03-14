@@ -4,9 +4,8 @@
 \alias{fast.iasva}
 \title{A function for fast IA-SVA}
 \usage{
-fast.iasva(Y, X, intercept = TRUE, num.sv = NULL,
-  component.retention = TRUE, retention.cutoff = 5,
-  num.sv.retention = NULL, tol = 1e-10, verbose = FALSE)
+fast.iasva(Y, X, intercept = TRUE, num.sv = NULL, pct.cutoff = 1,
+  num.tsv = NULL, tol = 1e-10, verbose = FALSE)
 }
 \arguments{
 \item{Y}{read counts matrix with samples in row and genes in column.}
@@ -17,11 +16,9 @@ fast.iasva(Y, X, intercept = TRUE, num.sv = NULL,
 
 \item{num.sv}{number of surrogate variables to estimate.}
 
-\item{component.retention}{If component.retention=TRUE, the percentage of unmodeled variance explained by the putative hidden factor.}
+\item{pct.cutoff}{percetage threshold for SV retention. IA-SVA computes the percentage of unmodeled variance explained by the putative hidden factor and compare it with the user-defined threshold. If the percentage is greater than the threshold, SV is retained.}
 
-\item{retention.cutoff}{percetage threshold for component retention.}
-
-\item{num.sv.retention}{num of top singular values to be used in computing the percentage of unmodeled variation explained by the putative hidden factor. If num.sv.retention=NULL, all singular values are used.}
+\item{num.tsv}{num of top singular values to be used in computing the percentage of unmodeled variation explained by the putative hidden factor. If num.tsv=NULL, all singular values are used.}
 
 \item{tol}{stopping tolerance for the augmented implicitly restarted Lanczos bidiagonalization algorithm}
 
@@ -30,16 +27,16 @@ fast.iasva(Y, X, intercept = TRUE, num.sv = NULL,
 \value{
 sv matrix of estimated surrogate variables, one column for each surrogate variable.
 
-percentage vector of percentages of unmodeled variance explained by each surrogate variable, one value for each surrogate variable.
+pct vector of percentages of unmodeled variance explained by each surrogate variable, one value for each surrogate variable.
 
 n.sv number of obtained surrogate variables.
 }
 \description{
-The iterative procedure of fast IA-SVA is implemented in this function (fast.iasva). fast.iasva() iteratively runs fast.iasva.unit() function 
-to identify a hidden factor for unwanted variation while accounting for all known factors, compute its contribution 
+The iterative procedure of fast IA-SVA is implemented in this function (fast.iasva). fast.iasva() iteratively  
+identify a hidden factor for unwanted variation while accounting for all known factors, compute its contribution 
 (i.e., the percentage of unmodeled variation explained by the hidden factor) on the unmodeled variation in the data. 
-If the contribution is greater than a user-defined cutoff (retention.cutoff, default = 5%), 
-fast.iasva() includes the factor as a known variable in the next iteration to find further hidden factors.
+If the contribution is greater than a user-defined cutoff (pct.cutoff, default = 1%), 
+the factor is retained and used as a known variable in the next iteration to find further hidden factors.
 }
 \examples{
 library(iasva)
