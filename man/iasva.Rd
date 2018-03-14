@@ -25,7 +25,7 @@ iasva(Y, X, intercept = TRUE, num.sv = NULL, permute = TRUE,
 
 \item{threads}{number of cores to be used in permutation test.}
 
-\item{num.sv.permtest}{num of top singluar values to be used in computing the permutation test statistic.}
+\item{num.sv.permtest}{num of top singular values to be used in computing the permutation test statistic. If num.sv.permtest=NULL, all singular values are used.}
 
 \item{tol}{stopping tolerance for the augmented implicitly restarted Lanczos bidiagonalization algorithm}
 

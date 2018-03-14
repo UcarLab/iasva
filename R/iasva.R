@@ -14,7 +14,7 @@
 #' @param num.p number of permutations to be used to calculate the permuation test p-value.
 #' @param sig.cutoff significance threshold for the permutation test
 #' @param threads number of cores to be used in permutation test.
-#' @param num.sv.permtest num of top singluar values to be used in computing the permutation test statistic.
+#' @param num.sv.permtest num of top singular values to be used in computing the permutation test statistic. If num.sv.permtest=NULL, all singular values are used.
 #' @param tol stopping tolerance for the augmented implicitly restarted Lanczos bidiagonalization algorithm
 #' @param verbose If verbose=TRUE, the function outputs detailed messages. 
 #'
