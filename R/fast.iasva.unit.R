@@ -8,7 +8,7 @@
 #' @param Y read counts matrix with samples in row and genes in column.
 #' @param X  known variables. 
 #' @param intercept If intercept=FALSE, the linear intercept is not included in the model.
-#' @param component.retention If component.retention=TRUE, the percentage of unmodeled variance explained by the putative hidden factor.
+#' @param sv.retention If sv.retention=TRUE, the percentage of unmodeled variance explained by the putative hidden factor.
 #' @param num.sv.retention num of top singular values to be used in computing the percentage of unmodeled variation explained by the putative hidden factor. If num.sv.retention=NULL, all singular values are used.
 #' @param tol stopping tolerance for the augmented implicitly restarted Lanczos bidiagonalization algorithm
 #' @param verbose If verbose=TRUE, the function outputs detailed messages. 
@@ -16,7 +16,7 @@
 #' @return sv estimated surrogate variable.
 #' @return percentage percentage of unmodeled variance explained by the estimated surrogate variable.
 
-fast.iasva.unit <- function(Y, X, intercept=TRUE, component.retention=TRUE, num.sv.retention=NULL, tol=1e-10, verbose=FALSE){
+fast.iasva.unit <- function(Y, X, intercept=TRUE, sv.retention=TRUE, num.sv.retention=NULL, tol=1e-10, verbose=FALSE){
   if(min(Y)<0){ Y <- Y + abs(min(Y)) }
   lY <- log(Y+1)
   if(intercept){
@@ -47,7 +47,7 @@ fast.iasva.unit <- function(Y, X, intercept=TRUE, component.retention=TRUE, num.
   sv <- irlba::irlba(tlY-rowMeans(tlY), 1, tol=tol)$v[,1]
   
   percentage <- NULL
-  if(component.retention==TRUE){
+  if(sv.retention==TRUE){
     if(verbose) {cat("\n Compute the percentage of unmodeled variance explained by SV")}
     if(is.null(num.sv.retention)){
       svd.res.obs <- svd(tresid - rowMeans(tresid))

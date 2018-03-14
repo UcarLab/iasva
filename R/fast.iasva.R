@@ -11,8 +11,8 @@
 #' @param X  known variables. 
 #' @param intercept If intercept=FALSE, the linear intercept is not included in the model.
 #' @param num.sv number of surrogate variables to estimate. 
-#' @param component.retention If component.retention=TRUE, the percentage of unmodeled variance explained by the putative hidden factor.
-#' @param retention.cutoff percetage threshold for component retention.
+#' @param sv.retention If sv.retention=TRUE, the percentage of unmodeled variance explained by the putative hidden factor.
+#' @param retention.cutoff percetage threshold for sv retention.
 #' @param num.sv.retention num of top singular values to be used in computing the percentage of unmodeled variation explained by the putative hidden factor. If num.sv.retention=NULL, all singular values are used.
 #' @param tol stopping tolerance for the augmented implicitly restarted Lanczos bidiagonalization algorithm
 #' @param verbose If verbose=TRUE, the function outputs detailed messages. 
@@ -28,7 +28,7 @@
 #'  
 #' @export
 
-fast.iasva <- function(Y, X, intercept=TRUE, num.sv=NULL, component.retention=TRUE, retention.cutoff= 5, num.sv.retention=NULL, tol=1e-10, verbose=FALSE){
+fast.iasva <- function(Y, X, intercept=TRUE, num.sv=NULL, sv.retention=TRUE, retention.cutoff= 5, num.sv.retention=NULL, tol=1e-10, verbose=FALSE){
   cat("fast IA-SVA running...")
   sv <- NULL
   percentage <- NULL
@@ -40,7 +40,7 @@ fast.iasva <- function(Y, X, intercept=TRUE, num.sv=NULL, component.retention=TR
         break
       }
     }
-    iasva.res <- fast.iasva.unit(Y, X, intercept, component.retention, num.sv.retention, tol, verbose)
+    iasva.res <- fast.iasva.unit(Y, X, intercept, sv.retention, num.sv.retention, tol, verbose)
     if(iasva.res$percentage < retention.cutoff){
       sv <- cbind(sv, iasva.res$sv)
       percentage <- c(percentage, iasva.res$percentage)
