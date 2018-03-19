@@ -72,7 +72,7 @@ fast.iasva <- function(Y, X, intercept=TRUE, num.sv=NULL, pct.cutoff= 1, num.tsv
     pct.i <- (svd.resid$d[1]^2/sum(svd.all$d^2))*100
     if(verbose) {cat("\n ",pct.i,"% of unmodeled variance is explained by SV")}
     
-    if(pct.i >= retention.cutoff){
+    if(pct.i >= pct.cutoff){
       sv <- cbind(sv, sv.i)
       pct <- c(pct, pct.i)
       X <- cbind(X, sv.i)
