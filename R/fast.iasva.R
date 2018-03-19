@@ -32,10 +32,10 @@ fast.iasva <- function(Y, X, intercept=TRUE, num.sv=NULL, pct.cutoff= 1, num.tsv
   if(min(Y)<0){ Y <- Y + abs(min(Y)) }
   lY <- log(Y+1)
   svd.all <- NULL
-  if(is.null(num.sv.retention)){
+  if(is.null(num.tsv)){
     svd.all <- svd(t(lY)-rowMeans(t(lY)))
   } else {
-    svd.all <- irlba::irlba(t(lY)-rowMeans(t(lY)), num.sv.retention, tol=tol)
+    svd.all <- irlba::irlba(t(lY)-rowMeans(t(lY)), num.tsv, tol=tol)
   }
   sv <- NULL
   pct <- NULL
