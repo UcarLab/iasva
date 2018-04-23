@@ -27,21 +27,7 @@ To load this package, enter the following command to the R console:
 
 ## View Vignettes
 
-Click __Quick View__ to view each vignette in a web browser. 
-
-
-##### Example 1) Detecting hidden heterogeneity in human islet alpha cells   ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/d4d63ce3/inst/doc/detecting_hidden_heterogeneity_iasvaV0.95.html)) 
-
-
-##### Example 2) Detecting cell-cycle stage difference in glioblastoma cells   ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/d4d63ce3/inst/doc/hidden_heterogeneity_glioblastoma_iasvaV0.95.html))
-
-
-##### Example 3) IA-SVA based feature selection improves the performance of clustering algorithms [1]  ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/d4d63ce3/inst/doc/tSNE_post_IA-SVA_3celltypes_iasvaV0.95.html))
-
-
-##### Example 4) IA-SVA based feature selection improves the performance of clustering algorithms [2]  ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/d4d63ce3/inst/doc/tSNE_post_IA-SVA_Xin_Islets_iasvaV0.95.html))
-
-
+For instructions on how to use IA-SVA, please see the package vignette.
 
 ## Disclaimer of Warranties and Liabilities
 

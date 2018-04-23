@@ -13,42 +13,63 @@ iasva(Y, X, intercept = TRUE, num.sv = NULL, permute = TRUE,
 
 \item{X}{known variables including the primary variables of interest.}
 
-\item{intercept}{If intercept=FALSE, the linear intercept is not included in the model.}
+\item{intercept}{If intercept = FALSE, the linear intercept
+is not included in the model.}
 
 \item{num.sv}{number of surrogate variables to estimate.}
 
-\item{permute}{If permute=TRUE, a permutation test (Buja and Eyuboglu 1992, Leek and Storey 2008) is conducted to assess the significance of the putative hidden factor.}
+\item{permute}{If permute = TRUE, a permutation test (Buja and Eyuboglu 1992,
+Leek and Storey 2008) is conducted to assess the significance of 
+the putative hidden factor.}
 
-\item{num.p}{number of permutations to be used to calculate the permuation test p-value.}
+\item{num.p}{number of permutations to be used to calculate the
+permuation test p-value.}
 
 \item{sig.cutoff}{significance threshold for the permutation test}
 
 \item{threads}{number of cores to be used in permutation test.}
 
-\item{num.sv.permtest}{num of top singular values to be used in computing the permutation test statistic. If num.sv.permtest=NULL, all singular values are used.}
+\item{num.sv.permtest}{num of top singular values to be used in
+computing the permutation test statistic. If num.sv.permtest = NULL,
+ all singular values are used.}
 
-\item{tol}{stopping tolerance for the augmented implicitly restarted Lanczos bidiagonalization algorithm}
+\item{tol}{stopping tolerance for the augmented implicitly restarted
+Lanczos bidiagonalization algorithm}
 
 \item{verbose}{If verbose=TRUE, the function outputs detailed messages.}
 }
 \value{
-sv matrix of estimated surrogate variables, one column for each surrogate variable.
+sv matrix of estimated surrogate variables, one column
+ for each surrogate variable.
 
-pc.stat.obs vector of PC test statistic values, one value for each surrogate variable.
+pc.stat.obs vector of PC test statistic values, 
+one value for each surrogate variable.
 
-pval vector of permuation p-values, one value for each surrogate variable.
+pval vector of permuation p-values, 
+one value for each surrogate variable.
 
 n.sv number of significant/obtained surrogate variables.
 }
 \description{
-The iterative procedure of IA-SVA is implemented in this function (iasva). iasva() iteratively runs iasva.unit() function 
-to identify a hidden factor for unwanted variation while accounting for all known factors and test the significance 
-of its contribution on the unmodeled variation in the data. If the test statistic of detected factor is significant, 
-iasva() includes the factor as a known variable in the next iteration to find further hidden factors.
+The iterative procedure of IA-SVA is implemented in this function (iasva).
+iasva() function iteratively runs iasva_unit() function 
+to identify a hidden factor for unwanted variation while accounting for
+ all known factors and test the significance of its contribution on the
+ unmodeled variation in the data. If the test statistic of detected factor
+ is significant, iasva() includes the factor as a known variable in the 
+ next iteration to find further hidden factors.
 }
 \examples{
 library(iasva)
-data(iasva_test)
-iasva.res <- iasva(iasvaY, iasvaX) 
- 
+counts_file <- system.file("extdata", "iasva_counts_test.Rds",
+ package = "iasva")
+counts <- readRDS(counts_file)
+anns_file <- system.file("extdata", "iasva_anns_test.Rds",
+ package = "iasva")
+ anns <- readRDS(anns_file)
+Geo_Lib_Size <- colSums(log(counts + 1))
+Patient_ID <- anns$Patient_ID
+mod <- model.matrix(~Patient_ID + Geo_Lib_Size)
+iasva.res<- iasva(t(counts), mod[, -1],verbose = FALSE, 
+ permute = FALSE, num.sv = 5)
 }
