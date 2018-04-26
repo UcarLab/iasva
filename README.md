@@ -10,7 +10,7 @@ https://www.biorxiv.org/content/early/2018/04/24/151217
 
 ## Author
 
-Donghyung Lee <donghyung.lee@jax.org> and Anthony Cheng <anthony.cheng@jax.org>
+Donghyung Lee <donghyung.lee@jax.org> and Anthony Cheng <anthony.cheng@jax.org>, Duygu Ucar 
 
 ## Installation
 
