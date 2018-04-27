@@ -44,8 +44,8 @@ anns <- readRDS(anns_file)
 
 ```
 
-## Calculate geometric library size, i.e., library size of 
-log-transfromed read counts. It is well known that the geometric library size
+## Calculate geometric library size, i.e., library size of log-transfromed read counts. 
+It is well known that the geometric library size
 (i.e., library size of log-transfromed read counts) or proportion of expressed
 genes in each cell explains a very large portion of variability of scRNA-Seq 
 data ([Hicks et. al. 2015 BioRxiv](http://biorxiv.org/content/early/2015/08/25/025528),
@@ -126,9 +126,8 @@ legend("bottomright", levels(Cell_Type), fill = color.vec, bty = "n")
 As shown above, tSNE fails to detect the outlier cells that are identified by
 IA-SVA when all genes are used. Same color coding is used as above. 
 
-## Run tSNE post IA-SVA analyses, i.e., run tSNE on marker genes associated
-with SV1 as detected by IA-SVA. Here, we apply tSNE on the marker genes 
-for SV1 obtained from IA-SVA
+## Run tSNE post IA-SVA analyses, i.e., run tSNE on marker genes associated with SV1 as detected by IA-SVA. 
+Here, we apply tSNE on the marker genes for SV1 obtained from IA-SVA
 ```{r run_tsne_post_iasva, echo=TRUE, fig.width=7, fig.height=7}
 set.seed(100)
 tsne.res <- Rtsne(unique(t(log(marker.counts + 1))), dims = 2)
