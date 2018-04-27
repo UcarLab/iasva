@@ -40,7 +40,7 @@ find_markers <- function(Y, iasva.sv, method = "BH", sig.cutoff = 0.05,
   lY <- log(Y + 1)
   all.markers <- NULL
   num.sv <- ncol(iasva.sv)
-  for (i in 1:num.sv) {
+  for (i in seq(from = 1, to = num.sv, by = 1)) {
     fit <- lm(lY ~ iasva.sv[, i])
     pval.vec <- unlist(lapply(summary(fit), function(x) x$coefficient[2, 4]))
     rsq.vec <- unlist(lapply(summary(fit), function(x) x$adj.r.squared))
