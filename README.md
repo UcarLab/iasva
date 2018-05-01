@@ -44,7 +44,7 @@ For additional tutorials, please click __Quick View__ for any of the four exampl
 
 ##### Example 4) IA-SVA based feature selection improves the performance of clustering algorithms [2]  ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/d4d63ce3/inst/doc/tSNE_post_IA-SVA_Xin_Islets_iasvaV0.95.html))
 
-##### Example 5) Compare IA-SVA to factor analyses methods in terms of their ability to detect marker genes for different cell types [2]  ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/d4d63ce3/inst/doc/tSNE_post_IA-SVA_Xin_Islets_iasvaV0.95.html))
+##### Example 5) Compare IA-SVA to factor analyses methods in terms of their ability to detect marker genes for different cell types [2]  ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/4b542d08/inst/doc/Brain_scRNASeq_neuron_vs_oligodendrocyte_single_run.html))
 
 
 ## Disclaimer of Warranties and Liabilities
