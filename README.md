@@ -17,7 +17,7 @@ Donghyung Lee <donghyung.lee@jax.org> and Anthony Cheng <anthony.cheng@jax.org>
 To install IA-SVA package, start R and enter the following commands:
 
       library(devtools)
-      devtools::install_github("UcarLab/IA-SVA")
+      devtools::install_github("UcarLab/iasva")
 
 
 ## Load the package
