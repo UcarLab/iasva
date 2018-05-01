@@ -39,10 +39,10 @@ For additional tutorials, please click __Quick View__ for any of the four exampl
 ##### Example 2) Detecting cell-cycle stage difference in glioblastoma cells   ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/4b542d08/inst/doc/hidden_heterogeneity_glioblastoma.html))
 
 
-##### Example 3) IA-SVA based feature selection improves the performance of clustering algorithms [1]  ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/4b542d08/inst/doc/tSNE_post_IA-SVA_3celltypes.html))
+##### Example 3) IA-SVA based feature selection improves the performance of clustering algorithms [1]  ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/2e4fa6f0/inst/doc/tSNE_post_IA-SVA_3celltypes.html))
 
 
-##### Example 4) IA-SVA based feature selection improves the performance of clustering algorithms [2]  ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/4b542d08/inst/doc/tSNE_post_IA-SVA_Xin_Islets.html))
+##### Example 4) IA-SVA based feature selection improves the performance of clustering algorithms [2]  ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/2e4fa6f0/inst/doc/tSNE_post_IA-SVA_Xin_Islets.html))
 
 ##### Example 5) Compare IA-SVA to factor analyses methods in terms of their ability to detect marker genes for different cell types [2]  ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/4b542d08/inst/doc/Brain_scRNASeq_neuron_vs_oligodendrocyte_single_run.html))
 
