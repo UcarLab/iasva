@@ -9,9 +9,11 @@ iasva(Y, X, intercept = TRUE, num.sv = NULL, permute = TRUE,
   tol = 1e-10, verbose = FALSE)
 }
 \arguments{
-\item{Y}{read counts matrix with samples in row and genes in column.}
+\item{Y}{A SummarizedExperiment class containing read counts where
+rows represent genes and columns represent samples.}
 
-\item{X}{known variables including the primary variables of interest.}
+\item{X}{A model matrix of known variables
+including the primary variables of interest.}
 
 \item{intercept}{If intercept = FALSE, the linear intercept
 is not included in the model.}
@@ -60,7 +62,6 @@ to identify a hidden factor for unwanted variation while accounting for
  next iteration to find further hidden factors.
 }
 \examples{
-library(iasva)
 counts_file <- system.file("extdata", "iasva_counts_test.Rds",
  package = "iasva")
 counts <- readRDS(counts_file)
@@ -70,6 +71,7 @@ anns_file <- system.file("extdata", "iasva_anns_test.Rds",
 Geo_Lib_Size <- colSums(log(counts + 1))
 Patient_ID <- anns$Patient_ID
 mod <- model.matrix(~Patient_ID + Geo_Lib_Size)
-iasva.res<- iasva(t(counts), mod[, -1],verbose = FALSE, 
+summ_exp <- SummarizedExperiment::SummarizedExperiment(assays = counts)
+iasva.res<- iasva(summ_exp, mod[, -1],verbose = FALSE, 
  permute = FALSE, num.sv = 5)
 }

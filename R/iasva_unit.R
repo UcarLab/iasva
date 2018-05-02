@@ -4,6 +4,8 @@
 iasva_unit <- function(Y, X, intercept = TRUE, permute = TRUE, num.p = 100,
                        threads = 1, num.sv.permtest = NULL,
                        tol = 1e-10, verbose = FALSE) {
+  # transpose the read counts
+  Y <- t(assay(Y))
   if (min(Y) < 0) {
     Y <- Y + abs(min(Y))
   }
@@ -60,13 +62,14 @@ iasva_unit <- function(Y, X, intercept = TRUE, permute = TRUE, num.p = 100,
     if (threads > 1) {
       threads <- min(threads, detectCores() - 1)
       cl <- makeCluster(threads)
-      pc.stat.null.vec <- tryCatch(parSapply(cl, 1:num.p, permute.svd),
+      pc.stat.null.vec <- tryCatch(parSapply(cl, 
+                                  seq(from = 1, to = num.p), permute.svd),
                                    error = function(err) {
                                      stopCluster(cl); stop(err)
                                      })
       stopCluster(cl)
     } else {
-      pc.stat.null.vec <- sapply(1:num.p, permute.svd)
+      pc.stat.null.vec <- vapply(seq(from = 1, to = num.p), permute.svd)
     }
     if (verbose) {
       cat("\n Empirical null distribution of the PC statistic:",

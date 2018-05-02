@@ -1,17 +1,19 @@
 #' A function for fast IA-SVA 
 #'
 #' The iterative procedure of fast IA-SVA is implemented in this 
-#' function (fast_iasva). fast_iasva() iterativel identify a hidden factor
-#' for unwanted variation while accounting for all known factors, 
-#' compute its contribution  (i.e., the percentage of unmodeled variation
+#' function (fast_iasva). fast_iasva() iteratively identifies a hidden factor
+#' for unwanted variation while accounting for all known factors, and
+#' computes its contribution  (i.e., the percentage of unmodeled variation
 #' explained by the hidden factor) on the unmodeled variation in the data. 
 #' If the contribution is greater than a user-defined cutoff (pct.cutoff,
 #'  default = 1%), the factor is retained and used as a known variable in 
 #'  the next iteration to find further hidden factors.  
 #' @importFrom irlba irlba
+#' @importFrom SummarizedExperiment SummarizedExperiment assay
 #'
-#' @param Y read counts matrix with samples in row and genes in column.
-#' @param X  known variables. 
+#' @param Y A SummarizedExperiment class containing read counts where
+#' rows represent genes and columns represent samples.
+#' @param X  A design matrix of known variables (e.g., patient ID, gender).
 #' @param intercept If intercept = FALSE, the linear 
 #' intercept is not included in the model.
 #' @param num.sv number of surrogate variables to estimate. 
@@ -33,7 +35,6 @@
 #' @return n.sv number of obtained surrogate variables. 
 #' 
 #' @examples
-#' library(iasva)
 #' counts_file <- system.file("extdata", "iasva_counts_test.Rds",
 #'  package = "iasva")
 #' counts <- readRDS(counts_file)
@@ -43,11 +44,14 @@
 #' Geo_Lib_Size <- colSums(log(counts + 1))
 #' Patient_ID <- anns$Patient_ID
 #' mod <- model.matrix(~Patient_ID + Geo_Lib_Size)
-#' iasva.res <- fast_iasva(t(counts), mod[, -1], num.sv = 5)
+#' summ_exp <- SummarizedExperiment::SummarizedExperiment(assays = counts)
+#' iasva.res <- fast_iasva(summ_exp, mod[, -1], num.sv = 5)
 #' @export
 
 fast_iasva <- function(Y, X, intercept = TRUE, num.sv = NULL, pct.cutoff = 1,
                        num.tsv = NULL, tol = 1e-10, verbose = FALSE) {
+  # transpose the read counts
+  Y <- t(assay(Y))
   cat("fast IA-SVA running...")
   if (min(Y) < 0) {
     Y <- Y + abs(min(Y))
@@ -118,7 +122,7 @@ fast_iasva <- function(Y, X, intercept = TRUE, num.sv = NULL, pct.cutoff = 1,
     cat(paste0("\nSV", isv, " Detected!"))
   }
   if (isv > 0) {
-    colnames(sv) <- paste0("SV", 1:ncol(sv))
+    colnames(sv) <- paste0("SV", seq(from = 1, to = ncol(sv), by = 1))
     cat(paste0("\n# of obtained surrogate variables: ", length(pct)))
     return(list(sv = sv, pct = pct, n.sv = length(pct)))
   } else {

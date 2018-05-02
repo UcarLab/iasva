@@ -5,8 +5,10 @@
 #'  identifies marker genes highly correlated with each surrogate variable
 #'  and returns a read counts matrix of the markers.
 #' @importFrom stats lm p.adjust
+#' @importFrom SummarizedExperiment SummarizedExperiment assay
 #'  
-#' @param Y read counts matrix with samples in row and genes in column.
+#' @param Y A SummarizedExperiment class containing read counts where
+#' rows represent genes and columns represent samples.
 #' @param iasva.sv  matrix of estimated surrogate variables,
 #'  one column for each surrogate variable. 
 #' @param method multiple testing adjustment method, default = "BH".
@@ -18,7 +20,6 @@
 #'  one column for each cell.
 #' 
 #' @examples
-#' library(iasva)
 #' counts_file <- system.file("extdata", "iasva_counts_test.Rds",
 #'  package = "iasva")
 #' counts <- readRDS(counts_file)
@@ -28,12 +29,15 @@
 #' Geo_Lib_Size <- colSums(log(counts + 1))
 #' Patient_ID <- anns$Patient_ID
 #' mod <- model.matrix(~Patient_ID + Geo_Lib_Size)
-#' iasva.res <- iasva(t(counts), mod[, -1], num.sv = 5, permute = FALSE)
-#' markers <- find_markers(t(counts), iasva.res$sv)
+#' summ_exp <- SummarizedExperiment::SummarizedExperiment(assays = counts)
+#' iasva.res <- iasva(summ_exp, mod[, -1], num.sv = 5, permute = FALSE)
+#' markers <- find_markers(summ_exp, iasva.res$sv)
 #' @export
 
 find_markers <- function(Y, iasva.sv, method = "BH", sig.cutoff = 0.05,
                          rsq.cutoff = 0.3, verbose = FALSE) {
+  # transpose the read counts
+  Y <- t(assay(Y))
   if (min(Y) < 0) {
     Y <- Y + abs(min(Y))
   }

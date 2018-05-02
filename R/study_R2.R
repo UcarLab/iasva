@@ -8,8 +8,10 @@
 #' @importFrom graphics Axis mtext par plot
 #' @importFrom stats .lm.fit cutree dist hclust lm p.adjust resid
 #' @importFrom cluster silhouette
+#' @importFrom SummarizedExperiment SummarizedExperiment assay
 #'
-#' @param Y read counts matrix with samples in row and genes in column.
+#' @param Y A SummarizedExperiment class containing read counts where
+#' rows represent genes and columns represent samples.
 #' @param iasva.sv  matrix of estimated surrogate variables,
 #'  one column for each surrogate variable. 
 #' @param selected.svs list of SVs that are selected for the
@@ -21,7 +23,6 @@
 #'  as a function of R2 and corresponding matrices. 
 #'  
 #' @examples
-#' library(iasva)
 #' counts_file <- system.file("extdata", "iasva_counts_test.Rds",
 #'  package = "iasva")
 #' counts <- readRDS(counts_file)
@@ -31,10 +32,11 @@
 #' Geo_Lib_Size <- colSums(log(counts + 1))
 #' Patient_ID <- anns$Patient_ID
 #' mod <- model.matrix(~Patient_ID + Geo_Lib_Size)
-#' iasva.res<- iasva(t(counts), mod[, -1],verbose = FALSE, 
+#' summ_exp <- SummarizedExperiment::SummarizedExperiment(assays = counts)
+#' iasva.res<- iasva(summ_exp, mod[, -1],verbose = FALSE, 
 #' permute = FALSE, num.sv = 5)
 #' iasva.sv <- iasva.res$sv
-#' study_res <- study_R2(t(counts), iasva.sv)
+#' study_res <- study_R2(summ_exp, iasva.sv)
 #' 
 #' @export
 
@@ -68,11 +70,11 @@ study_R2 <- function(Y, iasva.sv, selected.svs = 2,
        pch = 18, col = "blue", type = "b", lty = 2, cex = 2)
   Axis(1, at = seq(1, length(Number.of.genes)), side = 1,
        labels = seq(0.1, end.point, 0.05), las = 2)
-  par(new = T)
-  plot(C.scores, xlab = "", ylab = "", axes = F, pch = 18, col = "red",
+  par(new = TRUE)
+  plot(C.scores, xlab = "", ylab = "", axes = FALSE, pch = 18, col = "red",
        type = "b", lty = 2, cex = 2)
   Axis(side = 4)
   mtext(side = 4, line = 2, "Average Silhouette Score", col = "red")
-  par(new = F)
+  par(new = FALSE)
   return(output.matrix)
 }

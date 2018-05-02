@@ -7,9 +7,12 @@
 #'  unmodeled variation in the data. If the test statistic of detected factor
 #'  is significant, iasva() includes the factor as a known variable in the 
 #'  next iteration to find further hidden factors.  
-#'
-#' @param Y read counts matrix with samples in row and genes in column.
-#' @param X  known variables including the primary variables of interest. 
+#'  
+#' @importFrom SummarizedExperiment SummarizedExperiment assay
+#' @param Y A SummarizedExperiment class containing read counts where
+#' rows represent genes and columns represent samples.
+#' @param X  A model matrix of known variables
+#'  including the primary variables of interest. 
 #' @param intercept If intercept = FALSE, the linear intercept
 #'  is not included in the model.
 #' @param num.sv number of surrogate variables to estimate. 
@@ -36,7 +39,6 @@
 #' @return n.sv number of significant/obtained surrogate variables. 
 #' 
 #' @examples
-#' library(iasva)
 #' counts_file <- system.file("extdata", "iasva_counts_test.Rds",
 #'  package = "iasva")
 #' counts <- readRDS(counts_file)
@@ -46,7 +48,8 @@
 #' Geo_Lib_Size <- colSums(log(counts + 1))
 #' Patient_ID <- anns$Patient_ID
 #' mod <- model.matrix(~Patient_ID + Geo_Lib_Size)
-#' iasva.res<- iasva(t(counts), mod[, -1],verbose = FALSE, 
+#' summ_exp <- SummarizedExperiment::SummarizedExperiment(assays = counts)
+#' iasva.res<- iasva(summ_exp, mod[, -1],verbose = FALSE, 
 #'  permute = FALSE, num.sv = 5)
 #' @export
 
@@ -78,7 +81,7 @@ iasva <- function(Y, X, intercept = TRUE, num.sv = NULL, permute = TRUE,
     cat(paste0("\nSV", isv, " Detected!"))
   }
   if (isv > 0) {
-    colnames(sv) <- paste0("SV", 1:ncol(sv))
+    colnames(sv) <- paste0("SV", seq(from = 1, to = ncol(sv)))
     cat(paste0("\n# of significant surrogate variables: ", length(pval)))
     return(list(sv = sv, pc.stat.obs = pc.stat.obs,
                 pval = pval, n.sv = length(pval)))

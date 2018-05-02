@@ -10,21 +10,24 @@ anns <- readRDS(anns_file)
 Geo_Lib_Size <- colSums(log(counts + 1))
 Patient_ID <- anns$Patient_ID
 mod <- model.matrix(~Patient_ID + Geo_Lib_Size)
+# create summarized experiment object
+summ_exp <- SummarizedExperiment(assays = counts)
 
-# test that read counts input is matrix
-test_that("correct input matrix format", {
-  expect_gt(object = nrow(counts), expected = 1)
-  expect_gt(object = ncol(counts), expected = 1)
+# test that input is summarized experiment
+test_that("correct input format", {
+  expect_equal(object = class(summ_exp)[1], expected = "SummarizedExperiment")
+  expect_gt(object = nrow(assay(summ_exp)), expected = 1)
+  expect_gt(object = ncol(assay(summ_exp)), expected = 1)
 })
 
-iasva.res <- iasva(t(counts), mod[, -1], num.sv = 5, permute = FALSE) 
+iasva.res <- iasva(summ_exp, mod[, -1], num.sv = 5, permute = FALSE) 
 # test that output is list
 test_that("correct output results", {
   expect_type(object = iasva.res, type = "list")
   expect_equal(object = length(iasva.res), expected = 4)
 })
 
-markers <- find_markers(t(counts), iasva.res$sv)
+markers <- find_markers(summ_exp, iasva.res$sv)
 # test output of markers is matrix
 test_that("correct output marker matrix format", {
   expect_gt(object = nrow(markers), expected = 1)

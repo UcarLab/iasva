@@ -8,7 +8,8 @@ find_markers(Y, iasva.sv, method = "BH", sig.cutoff = 0.05,
   rsq.cutoff = 0.3, verbose = FALSE)
 }
 \arguments{
-\item{Y}{read counts matrix with samples in row and genes in column.}
+\item{Y}{A SummarizedExperiment class containing read counts where
+rows represent genes and columns represent samples.}
 
 \item{iasva.sv}{matrix of estimated surrogate variables,
 one column for each surrogate variable.}
@@ -32,7 +33,6 @@ Function takes a read counts matrix of entire gene set and a matrix
  and returns a read counts matrix of the markers.
 }
 \examples{
-library(iasva)
 counts_file <- system.file("extdata", "iasva_counts_test.Rds",
  package = "iasva")
 counts <- readRDS(counts_file)
@@ -42,6 +42,7 @@ anns_file <- system.file("extdata", "iasva_anns_test.Rds",
 Geo_Lib_Size <- colSums(log(counts + 1))
 Patient_ID <- anns$Patient_ID
 mod <- model.matrix(~Patient_ID + Geo_Lib_Size)
-iasva.res <- iasva(t(counts), mod[, -1], num.sv = 5, permute = FALSE)
-markers <- find_markers(t(counts), iasva.res$sv)
+summ_exp <- SummarizedExperiment::SummarizedExperiment(assays = counts)
+iasva.res <- iasva(summ_exp, mod[, -1], num.sv = 5, permute = FALSE)
+markers <- find_markers(summ_exp, iasva.res$sv)
 }

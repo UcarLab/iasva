@@ -4,7 +4,7 @@ author: "Donghyung Lee"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{"Detecting hidden heterogeneity in single cell RNA-Seq data"}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -13,7 +13,8 @@ vignette: >
 The iasva package can be used to detect hidden heterogenity within bulk or 
 single cell sequencing data. To illustrate how to use the iasva package for
 heterogenity detection, we use real-world single cell RNA sequencing (scRNA-Seq)
-data obtained from human pancreatic islet samples ([Lawlor et. al., 2016](http://genome.cshlp.org/content/early/2017/01/16/gr.212720.116)). 
+data obtained from human pancreatic islet samples 
+([Lawlor et. al., 2016](http://genome.cshlp.org/content/early/2017/01/16/gr.212720.116)). 
 
 ## Load packages
 ```{r load_packages, echo=TRUE, message=FALSE}
@@ -26,6 +27,7 @@ library(pheatmap)
 library(corrplot)
 library(DescTools)
 library(RColorBrewer)
+library(SummarizedExperiment)
 set.seed(100)
 color.vec <- brewer.pal(3, "Set1")
 ```
@@ -37,7 +39,9 @@ cells from healthy (non-diabetic) subjects (n = 101).
 ```{r load_data, echo=TRUE}
 counts_file <- system.file("extdata", "iasva_counts_test.Rds",
                          package = "iasva")
+# matrix of read counts where genes are rows, samples are columns
 counts <- readRDS(counts_file)
+# matrix of sample annotations/metadata
 anns_file <- system.file("extdata", "iasva_anns_test.Rds",
                          package = "iasva")
 anns <- readRDS(anns_file)
@@ -72,7 +76,9 @@ uncover which SVs can seperate cell types.
 set.seed(100)
 Patient_ID <- anns$Patient_ID
 mod <- model.matrix(~Patient_ID + Geo_Lib_Size)
-iasva.res<- iasva(t(counts), mod[, -1],verbose = FALSE, 
+# create a summarizedexperiment class
+summ_exp <- SummarizedExperiment(assays = counts)
+iasva.res<- iasva(summ_exp, mod[, -1],verbose = FALSE, 
                   permute = FALSE, num.sv = 5)
 iasva.sv <- iasva.res$sv
 plot(iasva.sv[, 1], iasva.sv[, 2], xlab = "SV1", ylab = "SV2")
@@ -98,7 +104,7 @@ Here, using the find_markers() function we find marker genes that are
 significantly associated with SV1 (multiple testing adjusted p-value < 0.05,
 default significance cutoff, and R-squared value > 0.3, default R-squared cutoff).  
 ```{r find_markers, echo=TRUE, fig.width=7, fig.height=14}
-marker.counts <- find_markers(t(counts), as.matrix(iasva.sv[,1]))
+marker.counts <- find_markers(summ_exp, as.matrix(iasva.sv[,1]))
 nrow(marker.counts)
 rownames(marker.counts)
 anno.col <- data.frame(Cell_Type = Cell_Type)
@@ -147,7 +153,7 @@ Here, we run a faster implementation of IA-SVA using the same known
 factors (Patient_ID and Geo_Lib_Size) as demonstrated above. This function
 is useful when working with particularly large datasets.
 ```{r fast_iasva, echo=TRUE}
-iasva.res <- fast_iasva(t(counts), mod[, -1], num.sv = 5)
+iasva.res <- fast_iasva(summ_exp, mod[, -1], num.sv = 5)
 ```
 
 ## Tuning parameters for IA-SVA
@@ -157,7 +163,7 @@ the quality of clustering results. With the study_R2() function,
 users can visualize how different R-squared thresholds influence both factors.
 
 ```{r study_r2, echo=TRUE, fig.width=7, fig.height=7}
-study_res <- study_R2(t(counts), iasva.sv)
+study_res <- study_R2(summ_exp, iasva.sv)
 ```
 This function produces a plot of the number of genes selected vs. the 
 cluster quality (average silhouette score) for different R-squared values.
