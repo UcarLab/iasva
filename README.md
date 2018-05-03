@@ -33,18 +33,18 @@ For instructions on how to use IA-SVA, please see the package vignette.
 
 For additional tutorials, please click __Quick View__ for any of the four examples below to view in a web browser. 
 
-##### Example 1) Detecting hidden heterogeneity in human islet alpha cells   ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/89f8f939/inst/doc/detecting_hidden_heterogeneity.html)) 
+##### Example 1) Detecting hidden heterogeneity in human islet alpha cells   ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/8d06bbd7/inst/doc/detecting_hidden_heterogeneity.html)) 
 
 
-##### Example 2) Detecting cell-cycle stage difference in glioblastoma cells   ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/89f8f939/inst/doc/hidden_heterogeneity_glioblastoma.html))
+##### Example 2) Detecting cell-cycle stage difference in glioblastoma cells   ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/8d06bbd7/inst/doc/hidden_heterogeneity_glioblastoma.html))
 
 
-##### Example 3) IA-SVA based feature selection improves the performance of clustering algorithms [1]  ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/2e4fa6f0/inst/doc/tSNE_post_IA-SVA_3celltypes.html))
+##### Example 3) IA-SVA based feature selection improves the performance of clustering algorithms [1]  ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/8d06bbd7/inst/doc/tSNE_post_IA-SVA_3celltypes.html))
 
 
-##### Example 4) IA-SVA based feature selection improves the performance of clustering algorithms [2]  ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/2e4fa6f0/inst/doc/tSNE_post_IA-SVA_Xin_Islets.html))
+##### Example 4) IA-SVA based feature selection improves the performance of clustering algorithms [2]  ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/8d06bbd7/inst/doc/tSNE_post_IA-SVA_Xin_Islets.html))
 
-##### Example 5) Compare IA-SVA to factor analyses methods in terms of their ability to detect marker genes for different cell types [2]  ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/4b542d08/inst/doc/Brain_scRNASeq_neuron_vs_oligodendrocyte_single_run.html))
+##### Example 5) Compare IA-SVA to factor analyses methods in terms of their ability to detect marker genes for different cell types [2]  ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/8d06bbd7/inst/doc/Brain_scRNASeq_neuron_vs_oligodendrocyte_single_run.html))
 
 
 ## Disclaimer of Warranties and Liabilities
