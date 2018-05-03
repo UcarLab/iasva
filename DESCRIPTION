@@ -1,7 +1,7 @@
 Package: iasva
 Type: Package
 Title: Iteratively Adjusted Surrogate Variable Analysis
-Version: 0.99.0
+Version: 0.99.1
 Date: 2018-04-23
 Authors@R: c(person("Donghyung", "Lee", email = "Donghyung.Lee@jax.org",
     role = c("aut", "cre")), person("Anthony", "Cheng", 
