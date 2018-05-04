@@ -69,7 +69,7 @@ iasva_unit <- function(Y, X, intercept = TRUE, permute = TRUE, num.p = 100,
                                      })
       stopCluster(cl)
     } else {
-      pc.stat.null.vec <- vapply(seq(from = 1, to = num.p), permute.svd)
+      pc.stat.null.vec <- sapply(seq(from = 1, to = num.p), permute.svd)
     }
     if (verbose) {
       cat("\n Empirical null distribution of the PC statistic:",
