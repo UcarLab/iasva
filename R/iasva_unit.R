@@ -1,7 +1,8 @@
 #' @importFrom stats .lm.fit cutree dist hclust lm p.adjust resid
 #' @importFrom irlba irlba
-#' @importFrom SummarizedExperiment SummarizedExperiment assay
 #' @importFrom BiocParallel bplapply MulticoreParam
+#' @importFrom SummarizedExperiment SummarizedExperiment assay
+
 iasva_unit <- function(Y, X, intercept = TRUE, permute = TRUE, num.p = 100,
                        threads = 1, num.sv.permtest = NULL,
                        tol = 1e-10, verbose = FALSE) {
