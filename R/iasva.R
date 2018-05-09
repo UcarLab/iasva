@@ -56,7 +56,11 @@
 iasva <- function(Y, X, intercept = TRUE, num.sv = NULL, permute = TRUE,
                   num.p = 100, sig.cutoff = 0.05, threads = 1,
                   num.sv.permtest = NULL, tol = 1e-10, verbose = FALSE) {
-  cat("IA-SVA running...")
+  # error handling
+  stopifnot(class(Y)[1] == "SummarizedExperiment", is.numeric(tol),
+            is.matrix(X), is.numeric(num.p), is.numeric(sig.cutoff),
+            is.numeric(threads))
+  message("IA-SVA running...")
   sv <- NULL
   pc.stat.obs <- NULL
   pval <- NULL
@@ -78,14 +82,14 @@ iasva <- function(Y, X, intercept = TRUE, num.sv = NULL, permute = TRUE,
       break
     }
     isv <- isv + 1
-    cat(paste0("\nSV", isv, " Detected!"))
+    message("\nSV ", isv, " Detected!")
   }
   if (isv > 0) {
     colnames(sv) <- paste0("SV", seq(from = 1, to = ncol(sv)))
-    cat(paste0("\n# of significant surrogate variables: ", length(pval)))
+    message("\n# of significant surrogate variables: ", length(pval))
     return(list(sv = sv, pc.stat.obs = pc.stat.obs,
                 pval = pval, n.sv = length(pval)))
   } else {
-    cat ("\nNo significant surrogate variables")
+    message("\nNo significant surrogate variables")
   }
 }

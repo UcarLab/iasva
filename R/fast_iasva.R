@@ -50,9 +50,13 @@
 
 fast_iasva <- function(Y, X, intercept = TRUE, num.sv = NULL, pct.cutoff = 1,
                        num.tsv = NULL, tol = 1e-10, verbose = FALSE) {
+  # error handling
+  stopifnot(class(Y)[1] == "SummarizedExperiment", is.numeric(tol),
+            is.matrix(X))
+  
   # transpose the read counts
   Y <- t(assay(Y))
-  cat("fast IA-SVA running...")
+  message("fast IA-SVA running...")
   if (min(Y) < 0) {
     Y <- Y + abs(min(Y))
   }
@@ -80,36 +84,36 @@ fast_iasva <- function(Y, X, intercept = TRUE, num.sv = NULL, pct.cutoff = 1,
     resid <- resid(fit)
     tresid <- t(resid)
     if (verbose) {
-      cat("\n Perform SVD on residuals")
+      message("\n Perform SVD on residuals")
     }
     svd.resid <- irlba(tresid - rowMeans(tresid), 1, tol = tol)
     if (verbose) {
-      cat("\n Regress residuals on PC1")
+      message("\n Regress residuals on PC1")
     }
     fit <- .lm.fit(cbind(1, svd.resid$v[, 1]), resid)
     if (verbose) {
-      cat("\n Get Rsq")
+      message("\n Get Rsq")
     }
     rsq.vec <- calc_rsq(resid, fit)
     if (verbose) {
-      cat("\n Rsq 0-1 Normalization")
+      message("\n Rsq 0-1 Normalization")
     }
     rsq.vec[is.na(rsq.vec)] <- min(rsq.vec, na.rm = TRUE)
     wgt <- (rsq.vec - min(rsq.vec)) / (max(rsq.vec) - min(rsq.vec))
     if (verbose) {
-      cat("\n Obtain weighted log-transformed read counts")
+      message("\n Obtain weighted log-transformed read counts")
     }
     tlY <- t(lY) * wgt
     if (verbose) {
-      cat("\n Perform SVD on weighted log-transformed read counts")
+      message("\n Perform SVD on weighted log-transformed read counts")
     }
     sv.i <- irlba(tlY - rowMeans(tlY), 1, tol = tol)$v[, 1]
     if (verbose) {
-      cat("\n Compute the percentage of unmodeled variance explained by SV")
+      message("\n Compute the percentage of unmodeled variance explained by SV")
     }
     pct.i <- (svd.resid$d[1] ^ 2 / sum(svd.all$d ^ 2)) * 100
     if (verbose) {
-      cat("\n ", pct.i, "% of unmodeled variance is explained by SV")
+      message("\n ", pct.i, "% of unmodeled variance is explained by SV")
     }
     if (pct.i >= pct.cutoff) {
       sv <- cbind(sv, sv.i)
@@ -119,14 +123,14 @@ fast_iasva <- function(Y, X, intercept = TRUE, num.sv = NULL, pct.cutoff = 1,
       break
     }
     isv <- isv + 1
-    cat(paste0("\nSV", isv, " Detected!"))
+    message("\nSV ", isv, " Detected!")
   }
   if (isv > 0) {
     colnames(sv) <- paste0("SV", seq(from = 1, to = ncol(sv), by = 1))
-    cat(paste0("\n# of obtained surrogate variables: ", length(pct)))
+    message("\n# of obtained surrogate variables: ", length(pct))
     return(list(sv = sv, pct = pct, n.sv = length(pct)))
   } else {
-    cat ("\nNo surrogate variables obtained")
+    message("\nNo surrogate variables obtained")
   }
 }
 

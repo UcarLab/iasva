@@ -8,9 +8,9 @@ A statistical framework for the robust detection of hidden variation in single c
 Donghyung Lee, Anthony Cheng, Mohan Bolisetty, Duygu Ucar
 https://www.biorxiv.org/content/early/2018/04/24/151217
 
-## Author
+## Author(s)
 
-Donghyung Lee <donghyung.lee@jax.org> and Anthony Cheng <anthony.cheng@jax.org>
+Donghyung Lee <donghyung.lee@jax.org> , Anthony Cheng <anthony.cheng@jax.org> , and Nathan Lawlor <nathan.lawlor@jax.org>
 
 ## Installation
 

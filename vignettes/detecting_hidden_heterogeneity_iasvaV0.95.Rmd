@@ -1,7 +1,7 @@
 ---
 title: "Detecting hidden heterogeneity in single cell RNA-Seq data"
 author: "Donghyung Lee"
-date: "`r Sys.Date()`"
+date: "May 10th, 2018"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{"Detecting hidden heterogeneity in single cell RNA-Seq data"}
@@ -18,7 +18,6 @@ data obtained from human pancreatic islet samples
 
 ## Load packages
 ```{r load_packages, echo=TRUE, message=FALSE}
-rm(list = ls())
 library(irlba) 
 library(iasva)
 library(sva)
@@ -59,40 +58,40 @@ counts is highly correlated with the geometric library size (r ~ 0.9).
 Here, we calculate the geometric library size vector, which will be used
 as a known factor in the IA-SVA algorithm.
 ```{r geno_lib_size, echo=TRUE, fig.width=7, fig.height=4}
-Geo_Lib_Size <- colSums(log(counts + 1))
-barplot(Geo_Lib_Size, xlab = "Cell", ylab = "Geometric Lib Size", las = 2)
+geo_lib_size <- colSums(log(counts + 1))
+barplot(geo_lib_size, xlab = "Cell", ylab = "Geometric Lib Size", las = 2)
 lcounts <- log(counts + 1)
 
 # PC1 and Geometric library size correlation
 pc1 <- irlba(lcounts - rowMeans(lcounts), 1)$v[, 1]
-cor(Geo_Lib_Size, pc1)
+cor(geo_lib_size, pc1)
 ```
 
 ## Run IA-SVA
-Here, we run IA-SVA using Patient_ID and Geo_Lib_Size as known factors
+Here, we run IA-SVA using patient_id and geo_lib_size as known factors
 and identify five hidden factors. SVs are plotted in a pairwise fashion to
 uncover which SVs can seperate cell types. 
 ```{r run_iasva, echo=TRUE, fig.width= 7, fig.height=6}
 set.seed(100)
-Patient_ID <- anns$Patient_ID
-mod <- model.matrix(~Patient_ID + Geo_Lib_Size)
+patient_id <- anns$Patient_ID
+mod <- model.matrix(~patient_id + geo_lib_size)
 # create a summarizedexperiment class
 summ_exp <- SummarizedExperiment(assays = counts)
 iasva.res<- iasva(summ_exp, mod[, -1],verbose = FALSE, 
                   permute = FALSE, num.sv = 5)
 iasva.sv <- iasva.res$sv
 plot(iasva.sv[, 1], iasva.sv[, 2], xlab = "SV1", ylab = "SV2")
-Cell_Type <- as.factor(iasva.sv[, 1] > -0.1) 
-levels(Cell_Type) <- c("Cell1", "Cell2")
-table(Cell_Type)
+cell_type <- as.factor(iasva.sv[, 1] > -0.1) 
+levels(cell_type) <- c("Cell1", "Cell2")
+table(cell_type)
 
 # We identified 6 outlier cells based on SV1 that are marked in red
-pairs(iasva.sv, main = "IA-SVA", pch = 21, col = color.vec[Cell_Type],
-      bg = color.vec[Cell_Type], oma = c(4,4,6,12))
-legend("right", levels(Cell_Type), fill = color.vec, bty = "n")
+pairs(iasva.sv, main = "IA-SVA", pch = 21, col = color.vec[cell_type],
+      bg = color.vec[cell_type], oma = c(4,4,6,12))
+legend("right", levels(cell_type), fill = color.vec, bty = "n")
 plot(iasva.sv[, 1:2], main = "IA-SVA", pch = 21, xlab = "SV1", ylab = "SV2",
-     col = color.vec[Cell_Type], bg = color.vec[Cell_Type])
-cor(Geo_Lib_Size, iasva.sv[, 1])
+     col = color.vec[cell_type], bg = color.vec[cell_type])
+cor(geo_lib_size, iasva.sv[, 1])
 corrplot(cor(iasva.sv))
 ```
 
@@ -107,7 +106,7 @@ default significance cutoff, and R-squared value > 0.3, default R-squared cutoff
 marker.counts <- find_markers(summ_exp, as.matrix(iasva.sv[,1]))
 nrow(marker.counts)
 rownames(marker.counts)
-anno.col <- data.frame(Cell_Type = Cell_Type)
+anno.col <- data.frame(cell_type = cell_type)
 rownames(anno.col) <- colnames(marker.counts)
 head(anno.col)
 pheatmap(log(marker.counts + 1), show_colnames = FALSE,
@@ -124,9 +123,9 @@ set.seed(100)
 tsne.res <- Rtsne(t(lcounts), dims = 2)
 
 plot(tsne.res$Y, main = "tSNE", xlab = "tSNE Dim1", ylab = "tSNE Dim2",
-     pch = 21, col = color.vec[Cell_Type], bg = color.vec[Cell_Type],
+     pch = 21, col = color.vec[cell_type], bg = color.vec[cell_type],
      oma = c(4, 4, 6, 12))
-legend("bottomright", levels(Cell_Type), fill = color.vec, bty = "n")
+legend("bottomright", levels(cell_type), fill = color.vec, bty = "n")
 ```
 
 As shown above, tSNE fails to detect the outlier cells that are identified by
@@ -138,9 +137,9 @@ Here, we apply tSNE on the marker genes for SV1 obtained from IA-SVA
 set.seed(100)
 tsne.res <- Rtsne(unique(t(log(marker.counts + 1))), dims = 2)
 plot(tsne.res$Y, main = "tSNE post IA-SVA", xlab = "tSNE Dim1",
-     ylab = "tSNE Dim2", pch = 21, col = color.vec[Cell_Type],
-     bg = color.vec[Cell_Type], oma = c(4, 4, 6, 12))
-legend("bottomright", levels(Cell_Type), fill = color.vec, bty = "n")
+     ylab = "tSNE Dim2", pch = 21, col = color.vec[cell_type],
+     bg = color.vec[cell_type], oma = c(4, 4, 6, 12))
+legend("bottomright", levels(cell_type), fill = color.vec, bty = "n")
 ```
 
 tSNE using SV1 marker genes better seperate these ourlier cells. 
@@ -150,7 +149,7 @@ variability in the single cell gene expression data.
 
 ## Using a faster implementation of IA-SVA (fast_iasva)
 Here, we run a faster implementation of IA-SVA using the same known
-factors (Patient_ID and Geo_Lib_Size) as demonstrated above. This function
+factors (patient_id and geo_lib_size) as demonstrated above. This function
 is useful when working with particularly large datasets.
 ```{r fast_iasva, echo=TRUE}
 iasva.res <- fast_iasva(summ_exp, mod[, -1], num.sv = 5)

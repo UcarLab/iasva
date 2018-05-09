@@ -42,6 +42,10 @@
 
 study_R2 <- function(Y, iasva.sv, selected.svs = 2,
                      no.clusters = 2, verbose = FALSE) {
+  # error handling
+  stopifnot(class(Y)[1] == "SummarizedExperiment", 
+            is.numeric(selected.svs),
+            is.matrix(iasva.sv), is.numeric(no.clusters))
   C.scores <- matrix(0, 0, 0)
   Number.of.genes <- matrix(0, 0, 0)
   for (i in seq(0.1, 0.9, 0.05)) {
