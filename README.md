@@ -46,6 +46,10 @@ For additional tutorials, please click __Quick View__ for any of the four exampl
 
 ##### Example 5) Compare IA-SVA to factor analyses methods in terms of their ability to detect marker genes for different cell types [2]  ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/8d06bbd7/inst/doc/Brain_scRNASeq_neuron_vs_oligodendrocyte_single_run.html))
 
+##### Example 6) scRNA-seq Data Simulation [1] ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/b0e03fe3/inst/doc/scRNAseq_simulation.html))
+
+##### Example 7) scRNA-seq Data Simulation [2] ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/b0e03fe3/inst/doc/sim_study_KF_HF_genes_overlap.html))
+
 
 ## Disclaimer of Warranties and Liabilities
 
