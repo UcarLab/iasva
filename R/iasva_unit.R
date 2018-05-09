@@ -1,6 +1,9 @@
 #' @importFrom stats .lm.fit cutree dist hclust lm p.adjust resid
 #' @importFrom irlba irlba
 #' @importFrom parallel detectCores makeCluster parSapply stopCluster
+#' @importFrom BiocParallel bplapply MulticoreParam
+#' @importFrom SummarizedExperiment SummarizedExperiment assay
+
 iasva_unit <- function(Y, X, intercept = TRUE, permute = TRUE, num.p = 100,
                        threads = 1, num.sv.permtest = NULL,
                        tol = 1e-10, verbose = FALSE) {
@@ -60,14 +63,18 @@ iasva_unit <- function(Y, X, intercept = TRUE, permute = TRUE, num.p = 100,
     pc.stat.null.vec <- rep(0, num.p)
     permute.svd <- permute_svd_factory(lY, X, num.sv.permtest, tol, verbose)
     if (threads > 1) {
-      threads <- min(threads, detectCores() - 1)
-      cl <- makeCluster(threads)
-      pc.stat.null.vec <- tryCatch(parSapply(cl, 
-                                  seq(from = 1, to = num.p), permute.svd),
-                                   error = function(err) {
-                                     stopCluster(cl); stop(err)
-                                     })
-      stopCluster(cl)
+      #threads <- min(threads, detectCores() - 1)
+      #cl <- makeCluster(threads)
+      #clusterExport(cl, "irlba")
+      #pc.stat.null.vec <- tryCatch(parSapply(cl, 
+      #                            seq(from = 1, to = num.p), permute.svd),
+      #                             error = function(err) {
+      #                               stopCluster(cl); stop(err)
+      #                               })
+      #stopCluster(cl)
+      pc.stat.null.vec <- tryCatch(bplapply(seq(from = 1, to = num.p), permute.svd, BPPARAM=MulticoreParam(workers=threads)),
+                                   error=function(err) {invisible(err); stop(err)})
+      
     } else {
       pc.stat.null.vec <- sapply(seq(from = 1, to = num.p), permute.svd)
     }
