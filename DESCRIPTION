@@ -26,7 +26,8 @@ Imports:
     stats,
     cluster,
     graphics,
-    SummarizedExperiment
+    SummarizedExperiment,
+    BiocParallel
 License: GPL-2
 biocViews: Preprocessing, QualityControl, BatchEffect
 Suggests:
