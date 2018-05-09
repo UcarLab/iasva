@@ -19,7 +19,7 @@ Description: Iteratively Adjusted Surrogate Variable Analysis (IA-SVA) is a
     iii), if significant, use the estimated factor as an additional known
     factor in the next iteration to uncover further hidden factors.
 Depends: 
-    R (>= 3.4),
+    R (>= 3.5),
 Imports:
     irlba,
     parallel,
