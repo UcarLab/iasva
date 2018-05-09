@@ -36,6 +36,12 @@
 
 find_markers <- function(Y, iasva.sv, method = "BH", sig.cutoff = 0.05,
                          rsq.cutoff = 0.3, verbose = FALSE) {
+  # error handling
+  stopifnot(class(Y)[1] == "SummarizedExperiment", is.numeric(sig.cutoff),
+            is.numeric(rsq.cutoff), is.matrix(iasva.sv),
+            method %in% c("holm", "hochberg", "hommel", "bonferroni",
+                          "BH", "BY", "fdr", "none"))
+  
   # transpose the read counts
   Y <- t(assay(Y))
   if (min(Y) < 0) {
@@ -52,12 +58,12 @@ find_markers <- function(Y, iasva.sv, method = "BH", sig.cutoff = 0.05,
     rsq.vec[is.na(rsq.vec)] <- 0
     adj.pval.vec <- p.adjust(pval.vec, method = method, n = length(pval.vec))
     markers <- colnames(Y)[adj.pval.vec < sig.cutoff & rsq.vec > rsq.cutoff]
-    cat(paste0("# of markers (", colnames(iasva.sv)[i], "): ",
-               length(markers), "\n"))
+    message("# of markers (", colnames(iasva.sv)[i], "): ",
+               length(markers), "\n")
     all.markers <- c(all.markers, markers)
   }
   all.markers <- unique(all.markers)
-  cat("total # of unique markers: ", length(all.markers))
+  message("total # of unique markers: ", length(all.markers))
   marker.counts <- t(Y[, colnames(Y) %in% all.markers])
   return(marker.counts)
 }

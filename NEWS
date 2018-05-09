@@ -1,1 +1,12 @@
 # A NEWS File to document package updates
+
+CHANGES IN VERSION 0.99.3
+-----------------------
+MODIFICATIONS:
+
+    * updated R functions to use stopifnot() for error control
+    * changed cat() to message() for communicating output
+    * change use of R CRAN parallel functions to BiocParallel
+    * replace date field with hard-corded date in vignette
+    * update variable names to lower snake case in vignette
+    * added new biocViews (RNASeq, Software, StatisticalMethod, FeatureExtraction)
