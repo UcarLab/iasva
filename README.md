@@ -50,6 +50,8 @@ For additional tutorials, please click __Quick View__ for any of the four exampl
 
 ##### Example 7) scRNA-seq Data Simulation [2] ([Quick View](https://cdn.rawgit.com/dleelab/iasvaExamples/b0e03fe3/inst/doc/sim_study_KF_HF_genes_overlap.html))
 
+## R Shiny Web Application
+An interactive web version of IA-SVA is also available at (coming soon)
 
 ## Disclaimer of Warranties and Liabilities
 
