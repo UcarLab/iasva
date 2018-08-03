@@ -16,10 +16,9 @@
 #' @param rsq.cutoff R squared cutoff.
 #' @param verbose If verbose = TRUE, the function outputs detailed messages.
 #'
-#' @return all.markers A list object where each element of the list contains
-#'  marker genes for each SV. The last element of the list contains
-#'  the unique marker genes across all SVs.
-#'
+#' @return marker.counts read counts matrix of markers,
+#'  one column for each cell.
+#' 
 #' @examples
 #' counts_file <- system.file("extdata", "iasva_counts_test.Rds",
 #'  package = "iasva")
@@ -49,8 +48,7 @@ find_markers <- function(Y, iasva.sv, method = "BH", sig.cutoff = 0.05,
     Y <- Y + abs(min(Y))
   }
   lY <- log(Y + 1)
-  # list of markers
-  all.markers <- list()
+  all.markers <- NULL
   num.sv <- ncol(iasva.sv)
   for (i in seq(from = 1, to = num.sv, by = 1)) {
     fit <- lm(lY ~ iasva.sv[, i])
@@ -62,14 +60,10 @@ find_markers <- function(Y, iasva.sv, method = "BH", sig.cutoff = 0.05,
     markers <- colnames(Y)[adj.pval.vec < sig.cutoff & rsq.vec > rsq.cutoff]
     message("# of markers (", colnames(iasva.sv)[i], "): ",
                length(markers), "\n")
-    all.markers[[i]] <- markers
-    names(all.markers)[i] <- colnames(iasva.sv)[i]
+    all.markers <- c(all.markers, markers)
   }
-  uniq.markers <- unique(unlist(all.markers))
-  message("total # of unique markers: ", length(uniq.markers))
-  # append unique markers to end of list
-  all.markers[[num.sv + 1]] <- uniq.markers
-  names(all.markers)[num.sv + 1] <- "All_Unique_Markers"
-  # marker.counts <- t(Y[, colnames(Y) %in% all.markers])
-  return(all.markers)
+  all.markers <- unique(all.markers)
+  message("total # of unique markers: ", length(all.markers))
+  marker.counts <- t(Y[, colnames(Y) %in% all.markers])
+  return(marker.counts)
 }
