@@ -51,7 +51,9 @@ For additional tutorials, please click __Quick View__ for any of the four exampl
 ##### Example 7) scRNA-seq Data Simulation [2] ([Quick View](https://dleelab.github.io/iasvaExamples/sim_study_KF_HF_genes_overlap.html))
 
 ## R Shiny Web Application
-An interactive web version of IA-SVA is also available at (coming soon)
+An interactive web version of IA-SVA is publicly hosted on [shinyapps.io here](https://nlawlor.shinyapps.io/VIASVA/) 
+
+The github page for this application is available [here](https://github.com/nlawlor/iasva_shiny/tree/master)
 
 ## Disclaimer of Warranties and Liabilities
 
