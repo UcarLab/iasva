@@ -27,6 +27,17 @@ To load this package, enter the following command to the R console:
       library(iasva)
 
 
+## Bioconductor
+
+IA-SVA is also available for download from Bioconductor [(link to development version here)](https://www.bioconductor.org/packages/devel/bioc/html/iasva.html)
+
+To install and load the package, please enter the following into the R console:
+
+      if (!requireNamespace("BiocManager", quietly = TRUE))
+      install.packages("BiocManager")
+      BiocManager::install("iasva", version = "devel")
+      library(iasva)
+
 ## View Vignettes
 
 For instructions on how to use IA-SVA, please see the package vignette.
