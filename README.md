@@ -4,9 +4,7 @@ Iteratively Adjusted Surrogate Variable Analysis (IA-SVA) is a statistical frame
 
 ## Citing IA-SVA
 
-A statistical framework for the robust detection of hidden variation in single cell transcriptomes
-Donghyung Lee, Anthony Cheng, Mohan Bolisetty, Duygu Ucar
-https://www.biorxiv.org/content/early/2018/04/24/151217
+Our work has been published in _Scientific Reports_: [Detection of correlated hidden factors from single cell transcriptomes using Iteratively Adjusted-SVA (IA-SVA)](https://www.nature.com/articles/s41598-018-35365-9) Donghyung Lee, Anthony Cheng, Nathan Lawlor, Mohan Bolisetty, Duygu Ucar
 
 ## Author(s)
 
@@ -60,10 +58,6 @@ For additional tutorials, please click __Quick View__ for any of the four exampl
 ##### Example 6) scRNA-seq Data Simulation [1] ([Quick View](https://dleelab.github.io/iasvaExamples/scRNAseq_simulation.html))
 
 ##### Example 7) scRNA-seq Data Simulation [2] ([Quick View](https://dleelab.github.io/iasvaExamples/sim_study_KF_HF_genes_overlap.html))
-
-## Publication
-
-Read our published paper in _Scientific Reports_: [Detection of correlated hidden factors from single cell transcriptomes using Iteratively Adjusted-SVA (IA-SVA)](https://www.nature.com/articles/s41598-018-35365-9)
 
 ## R Shiny Web Application
 An interactive web version of IA-SVA is publicly hosted on [shinyapps.io here](https://nlawlor.shinyapps.io/VIASVA/) 
