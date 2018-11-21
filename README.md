@@ -61,6 +61,10 @@ For additional tutorials, please click __Quick View__ for any of the four exampl
 
 ##### Example 7) scRNA-seq Data Simulation [2] ([Quick View](https://dleelab.github.io/iasvaExamples/sim_study_KF_HF_genes_overlap.html))
 
+## Publication
+
+Read our published paper in _Scientific Reports_: [Detection of correlated hidden factors from single cell transcriptomes using Iteratively Adjusted-SVA (IA-SVA)](https://www.nature.com/articles/s41598-018-35365-9)
+
 ## R Shiny Web Application
 An interactive web version of IA-SVA is publicly hosted on [shinyapps.io here](https://nlawlor.shinyapps.io/VIASVA/) 
 
