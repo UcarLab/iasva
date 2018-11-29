@@ -10,3 +10,9 @@ MODIFICATIONS:
     * replace date field with hard-corded date in vignette
     * update variable names to lower snake case in vignette
     * added new biocViews (RNASeq, Software, StatisticalMethod, FeatureExtraction)
+
+CHANGES IN VERSION 1.0
+-----------------------
+MODIFICATIONS:
+
+    * added new biocViews tag "ImmunoOncology"

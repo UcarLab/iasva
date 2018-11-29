@@ -1,8 +1,8 @@
 Package: iasva
 Type: Package
 Title: Iteratively Adjusted Surrogate Variable Analysis
-Version: 1.1.0
-Date: 2018-05-10
+Version: 1.1.1
+Date: 2018-11-29
 Authors@R: c(person("Donghyung", "Lee", email = "Donghyung.Lee@jax.org",
     role = c("aut", "cre")), person("Anthony", "Cheng", 
     email = "Anthony.Cheng@jax.org", role = "aut"),
@@ -29,7 +29,7 @@ Imports:
     BiocParallel
 License: GPL-2
 biocViews: Preprocessing, QualityControl, BatchEffect, RNASeq, Software,
-    StatisticalMethod, FeatureExtraction 
+    StatisticalMethod, FeatureExtraction, ImmunoOncology 
 Suggests:
     knitr,
     testthat,
