@@ -9,8 +9,9 @@
 #'  next iteration to find further hidden factors.  
 #'  
 #' @importFrom SummarizedExperiment SummarizedExperiment assay
-#' @param Y A SummarizedExperiment class containing read counts where
-#' rows represent genes and columns represent samples.
+#' @importFrom SingleCellExperiment SingleCellExperiment
+#' @param Y A SummarizedExperiment or SingleCellExperiment class containing
+#' read counts where rows represent genes and columns represent samples.
 #' @param X  A model matrix of known variables
 #'  including the primary variables of interest. 
 #' @param intercept If intercept = FALSE, the linear intercept
@@ -57,7 +58,8 @@ iasva <- function(Y, X, intercept = TRUE, num.sv = NULL, permute = TRUE,
                   num.p = 100, sig.cutoff = 0.05, threads = 1,
                   num.sv.permtest = NULL, tol = 1e-10, verbose = FALSE) {
   # error handling
-  stopifnot(class(Y)[1] == "SummarizedExperiment", is.numeric(tol),
+  stopifnot(class(Y)[1] == "SummarizedExperiment" | class(Y) == "SingleCellExperiment",
+            is.numeric(tol),
             is.matrix(X), is.numeric(num.p), is.numeric(sig.cutoff),
             is.numeric(threads))
   message("IA-SVA running...")
