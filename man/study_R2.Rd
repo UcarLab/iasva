@@ -7,8 +7,8 @@
 study_R2(Y, iasva.sv, selected.svs = 2, no.clusters = 2, verbose = FALSE)
 }
 \arguments{
-\item{Y}{A SummarizedExperiment class containing read counts where
-rows represent genes and columns represent samples.}
+\item{Y}{A SummarizedExperiment or SingleCellExperiment class containing
+read counts where rows represent genes and columns represent samples.}
 
 \item{iasva.sv}{matrix of estimated surrogate variables,
 one column for each surrogate variable.}
