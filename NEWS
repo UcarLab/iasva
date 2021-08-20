@@ -16,3 +16,9 @@ CHANGES IN VERSION 1.0
 MODIFICATIONS:
 
     * added new biocViews tag "ImmunoOncology"
+
+CHANGES IN VERSION 1.11.0
+-----------------------
+MODIFICATIONS:
+
+    * added support for SingleCellExperiment objects in functions
