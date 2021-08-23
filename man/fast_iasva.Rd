@@ -4,12 +4,20 @@
 \alias{fast_iasva}
 \title{A function for fast IA-SVA}
 \usage{
-fast_iasva(Y, X, intercept = TRUE, num.sv = NULL, pct.cutoff = 1,
-  num.tsv = NULL, tol = 1e-10, verbose = FALSE)
+fast_iasva(
+  Y,
+  X,
+  intercept = TRUE,
+  num.sv = NULL,
+  pct.cutoff = 1,
+  num.tsv = NULL,
+  tol = 1e-10,
+  verbose = FALSE
+)
 }
 \arguments{
-\item{Y}{A SummarizedExperiment class containing read counts where
-rows represent genes and columns represent samples.}
+\item{Y}{A SummarizedExperiment or SingleCellExperiment class containing
+read counts where rows represent genes and columns represent samples.}
 
 \item{X}{A design matrix of known variables (e.g., patient ID, gender).}
 

@@ -10,9 +10,10 @@
 #'  the next iteration to find further hidden factors.  
 #' @importFrom irlba irlba
 #' @importFrom SummarizedExperiment SummarizedExperiment assay
+#' @importFrom SingleCellExperiment SingleCellExperiment
 #'
-#' @param Y A SummarizedExperiment class containing read counts where
-#' rows represent genes and columns represent samples.
+#' @param Y A SummarizedExperiment or SingleCellExperiment class containing
+#' read counts where rows represent genes and columns represent samples.
 #' @param X  A design matrix of known variables (e.g., patient ID, gender).
 #' @param intercept If intercept = FALSE, the linear 
 #' intercept is not included in the model.
@@ -51,11 +52,12 @@
 fast_iasva <- function(Y, X, intercept = TRUE, num.sv = NULL, pct.cutoff = 1,
                        num.tsv = NULL, tol = 1e-10, verbose = FALSE) {
   # error handling
-  stopifnot(class(Y)[1] == "SummarizedExperiment", is.numeric(tol),
+  stopifnot(class(Y)[1] == "SummarizedExperiment" | class(Y) == "SingleCellExperiment",
+            is.numeric(tol),
             is.matrix(X))
   
   # transpose the read counts
-  Y <- t(assay(Y))
+  Y <- as.matrix(t(assay(Y)))
   message("fast IA-SVA running...")
   if (min(Y) < 0) {
     Y <- Y + abs(min(Y))

@@ -6,9 +6,10 @@
 #'  and returns a read counts matrix of the markers.
 #' @importFrom stats lm p.adjust
 #' @importFrom SummarizedExperiment SummarizedExperiment assay
+#' @importFrom SingleCellExperiment SingleCellExperiment
 #'  
-#' @param Y A SummarizedExperiment class containing read counts where
-#' rows represent genes and columns represent samples.
+#' @param Y A SummarizedExperiment or SingleCellExperiment class containing
+#' read counts where rows represent genes and columns represent samples.
 #' @param iasva.sv  matrix of estimated surrogate variables,
 #'  one column for each surrogate variable. 
 #' @param method multiple testing adjustment method, default = "BH".
@@ -37,13 +38,14 @@
 find_markers <- function(Y, iasva.sv, method = "BH", sig.cutoff = 0.05,
                          rsq.cutoff = 0.3, verbose = FALSE) {
   # error handling
-  stopifnot(class(Y)[1] == "SummarizedExperiment", is.numeric(sig.cutoff),
+  stopifnot(class(Y)[1] == "SummarizedExperiment" | class(Y) == "SingleCellExperiment",
+            is.numeric(sig.cutoff),
             is.numeric(rsq.cutoff), is.matrix(iasva.sv),
             method %in% c("holm", "hochberg", "hommel", "bonferroni",
                           "BH", "BY", "fdr", "none"))
   
   # transpose the read counts
-  Y <- t(assay(Y))
+  Y <- as.matrix(t(assay(Y)))
   if (min(Y) < 0) {
     Y <- Y + abs(min(Y))
   }

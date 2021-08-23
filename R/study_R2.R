@@ -9,9 +9,10 @@
 #' @importFrom stats .lm.fit cutree dist hclust lm p.adjust resid
 #' @importFrom cluster silhouette
 #' @importFrom SummarizedExperiment SummarizedExperiment assay
+#' @importFrom SingleCellExperiment SingleCellExperiment
 #'
-#' @param Y A SummarizedExperiment class containing read counts where
-#' rows represent genes and columns represent samples.
+#' @param Y A SummarizedExperiment or SingleCellExperiment class containing
+#' read counts where rows represent genes and columns represent samples.
 #' @param iasva.sv  matrix of estimated surrogate variables,
 #'  one column for each surrogate variable. 
 #' @param selected.svs list of SVs that are selected for the
@@ -43,7 +44,7 @@
 study_R2 <- function(Y, iasva.sv, selected.svs = 2,
                      no.clusters = 2, verbose = FALSE) {
   # error handling
-  stopifnot(class(Y)[1] == "SummarizedExperiment", 
+  stopifnot(class(Y)[1] == "SummarizedExperiment" | class(Y) == "SingleCellExperiment",
             is.numeric(selected.svs),
             is.matrix(iasva.sv), is.numeric(no.clusters))
   C.scores <- matrix(0, 0, 0)

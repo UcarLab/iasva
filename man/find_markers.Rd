@@ -4,12 +4,18 @@
 \alias{find_markers}
 \title{A function for finding markers for hidden factors}
 \usage{
-find_markers(Y, iasva.sv, method = "BH", sig.cutoff = 0.05,
-  rsq.cutoff = 0.3, verbose = FALSE)
+find_markers(
+  Y,
+  iasva.sv,
+  method = "BH",
+  sig.cutoff = 0.05,
+  rsq.cutoff = 0.3,
+  verbose = FALSE
+)
 }
 \arguments{
-\item{Y}{A SummarizedExperiment class containing read counts where
-rows represent genes and columns represent samples.}
+\item{Y}{A SummarizedExperiment or SingleCellExperiment class containing
+read counts where rows represent genes and columns represent samples.}
 
 \item{iasva.sv}{matrix of estimated surrogate variables,
 one column for each surrogate variable.}

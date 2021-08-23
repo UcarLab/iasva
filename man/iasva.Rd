@@ -4,13 +4,23 @@
 \alias{iasva}
 \title{A function for iteratively adjusted surrogate variable analysis (IA-SVA)}
 \usage{
-iasva(Y, X, intercept = TRUE, num.sv = NULL, permute = TRUE,
-  num.p = 100, sig.cutoff = 0.05, threads = 1, num.sv.permtest = NULL,
-  tol = 1e-10, verbose = FALSE)
+iasva(
+  Y,
+  X,
+  intercept = TRUE,
+  num.sv = NULL,
+  permute = TRUE,
+  num.p = 100,
+  sig.cutoff = 0.05,
+  threads = 1,
+  num.sv.permtest = NULL,
+  tol = 1e-10,
+  verbose = FALSE
+)
 }
 \arguments{
-\item{Y}{A SummarizedExperiment class containing read counts where
-rows represent genes and columns represent samples.}
+\item{Y}{A SummarizedExperiment or SingleCellExperiment class containing
+read counts where rows represent genes and columns represent samples.}
 
 \item{X}{A model matrix of known variables
 including the primary variables of interest.}

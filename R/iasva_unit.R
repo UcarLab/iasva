@@ -2,17 +2,19 @@
 #' @importFrom irlba irlba
 #' @importFrom BiocParallel bplapply MulticoreParam
 #' @importFrom SummarizedExperiment SummarizedExperiment assay
+#' @importFrom SingleCellExperiment SingleCellExperiment
 
 iasva_unit <- function(Y, X, intercept = TRUE, permute = TRUE, num.p = 100,
                        threads = 1, num.sv.permtest = NULL,
                        tol = 1e-10, verbose = FALSE) {
   # error handling
-  stopifnot(class(Y)[1] == "SummarizedExperiment", is.numeric(tol),
+  stopifnot(class(Y)[1] == "SummarizedExperiment" | class(Y) == "SingleCellExperiment",
+            is.numeric(tol),
             is.matrix(X), is.numeric(num.p),
             is.numeric(threads))
   
   # transpose the read counts
-  Y <- t(assay(Y))
+  Y <- as.matrix(t(assay(Y)))
   if (min(Y) < 0) {
     Y <- Y + abs(min(Y))
   }
